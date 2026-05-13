@@ -32,7 +32,6 @@ $images = $stmt->fetchAll();
 <meta charset="UTF-8">
 <title><?php echo $car['nom_marque'] . " " . $car['modele']; ?></title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
 <style>
 body {
     background: #0f0f0f;
@@ -41,22 +40,22 @@ body {
     margin: 0;
 }
 
-/* CONTAINER */
-.detail-container {
+
+ .detail-container {
     max-width: 1300px;
     margin: 60px auto;
     padding: 20px;
 }
 
-/* GRID */
-.detail-grid {
+
+ .detail-grid {
     display: grid;
     grid-template-columns: 1.2fr 1fr;
     gap: 50px;
 }
 
-/* IMAGE */
-.main-img {
+
+ .main-img {
     width: 100%;
     height: 500px;
     object-fit: cover;
@@ -64,13 +63,13 @@ body {
     transition: 0.4s;
 }
 
-.thumbnails {
+ .thumbnails {
     display: flex;
     gap: 10px;
     margin-top: 15px;
 }
 
-.thumb {
+ .thumb {
     width: 90px;
     height: 70px;
     object-fit: cover;
@@ -80,59 +79,59 @@ body {
     transition: 0.3s;
 }
 
-.thumb:hover {
+ .thumb:hover {
     opacity: 1;
 }
 
-/* INFOS */
-.title {
+
+ .title {
     font-size: 40px;
     font-weight: bold;
 }
 
-.price {
+ .price {
     font-size: 28px;
     color: #f39c12;
     margin: 15px 0;
 }
 
-.desc {
+ .desc {
     color: #bbb;
     margin-bottom: 25px;
     line-height: 1.6;
 }
 
-/* SPECS */
-.specs {
+
+ .specs {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
     margin-bottom: 30px;
 }
 
-.spec {
+ .spec {
     background: #1c1c1c;
     padding: 15px;
     border-radius: 10px;
 }
 
-.spec span {
+ .spec span {
     display: block;
     color: #888;
     font-size: 14px;
 }
 
-.spec strong {
+ .spec strong {
     font-size: 16px;
 }
 
-/* BOUTONS */
-.actions {
+
+ .actions {
     display: flex;
     gap: 15px;
 }
 
-.btn-main {
+ .btn-main {
     background: #f39c12;
     padding: 12px 25px;
     border-radius: 30px;
@@ -142,11 +141,11 @@ body {
     transition: 0.3s;
 }
 
-.btn-main:hover {
+ .btn-main:hover {
     background: white;
 }
 
-.btn-secondary {
+ .btn-secondary {
     border: 1px solid #555;
     padding: 12px 25px;
     border-radius: 30px;
@@ -154,38 +153,39 @@ body {
     text-decoration: none;
 }
 
-.btn-secondary:hover {
+ .btn-secondary:hover {
     background: #222;
 }
 
-/* SECTION BAS */
-.extra {
+
+ .extra {
     margin-top: 60px;
 }
 
-.extra h3 {
+ .extra h3 {
     margin-bottom: 20px;
 }
 
-.features {
+ .features {
     display: flex;
     gap: 20px;
     flex-wrap: wrap;
 }
 
-.feature {
+ .feature {
     background: #1c1c1c;
     padding: 15px 20px;
     border-radius: 10px;
 }
 
-/* RESPONSIVE */
-@media(max-width: 900px){
-    .detail-grid {
+
+@media(max-width: 900px) {
+.detail-grid {
         grid-template-columns: 1fr;
     }
 }
 </style>
+
 </head>
 
 <body>
@@ -288,6 +288,8 @@ document.querySelectorAll('.thumb').forEach(img => {
     });
 });
 </script>
+
+<?php include 'includes/footer.php'; ?>
 
 </body>
 </html>

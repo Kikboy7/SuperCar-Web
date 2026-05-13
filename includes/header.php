@@ -14,7 +14,7 @@ if (isset($_SESSION['client'])) {
 ?>
 
 <style>
-/* 🔥 NAVBAR CUSTOM (écrase Bootstrap proprement) */
+/* NAVBAR CUSTOM */
 .custom-navbar {
     position: sticky;
     top: 0;
@@ -26,7 +26,7 @@ if (isset($_SESSION['client'])) {
     padding: 15px 0;
 }
 
-/* CONTENEUR CENTRÉ */
+/* CONTENEUR CENTRE */
 .custom-container {
     max-width: 1200px;
     margin: auto;
@@ -92,6 +92,8 @@ if (isset($_SESSION['client'])) {
 }
 </style>
 
+
+
 <nav class="custom-navbar">
 
     <div class="custom-container">
@@ -105,7 +107,7 @@ if (isset($_SESSION['client'])) {
         <div class="nav-center">
             <a href="index.php">Accueil</a>
             <a href="voitures.php">Voitures</a>
-            <a href="essai.php">Essai</a>
+            <a href="reservation.php">Essai</a>
             <a href="services.php">Services</a>
             <a href="contact.php">Contact</a>
         </div>

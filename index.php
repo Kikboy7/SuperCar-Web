@@ -10,37 +10,36 @@ include 'includes/db.php';
     <meta charset="UTF-8">
     <title>SuperCar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        body {
+<style>
+body {
             background: #0f0f0f;
             color: white;
             font-family: 'Segoe UI', sans-serif;
         }
 
-        /* NAVBAR */
-        .navbar {
+        
+         .navbar {
             background: rgba(0,0,0,0.9);
             backdrop-filter: blur(10px);
         }
 
-        .nav-link {
+         .nav-link {
             color: #ccc !important;
             transition: 0.3s;
         }
 
-        .nav-link:hover {
+         .nav-link:hover {
             color: #f39c12 !important;
         }
 
-        /* HERO */
-        .hero {
+        
+         .hero {
             height: 90vh;
             background: url("images/background1.webp") center/cover no-repeat;
             position: relative;
         }
 
-        .hero::before {
+         .hero::before {
             content: "";
             position: absolute;
             width: 100%;
@@ -48,7 +47,7 @@ include 'includes/db.php';
             background: rgba(0,0,0,0.6);
         }
 
-        .overlay {
+         .overlay {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -56,19 +55,19 @@ include 'includes/db.php';
             text-align: center;
         }
 
-        .overlay h1 {
+         .overlay h1 {
             font-size: 55px;
             font-weight: bold;
             letter-spacing: 2px;
         }
 
-        .overlay p {
+         .overlay p {
             font-size: 20px;
             margin-bottom: 20px;
             color: #ccc;
         }
 
-        .btn-main {
+         .btn-main {
             background: #f39c12;
             border: none;
             padding: 10px 25px;
@@ -78,73 +77,74 @@ include 'includes/db.php';
             transition: 0.3s;
         }
 
-        .btn-main:hover {
+         .btn-main:hover {
             background: white;
             color: black;
         }
 
-        /* SECTION */
-        .section {
+        
+         .section {
             padding: 80px 0;
         }
 
-        .section-title {
+         .section-title {
             text-align: center;
             margin-bottom: 50px;
             font-size: 35px;
             font-weight: bold;
         }
 
-        /* CARDS */
-        .car-card {
+        
+         .car-card {
             background: #1c1c1c;
             border-radius: 15px;
             overflow: hidden;
             transition: 0.3s;
         }
 
-        .car-card img {
+         .car-card img {
             width: 100%;
             height: 220px;
             object-fit: cover;
             transition: 0.4s;
         }
 
-        .car-card:hover img {
+         .car-card:hover img {
             transform: scale(1.1);
         }
 
-        .car-card:hover {
+         .car-card:hover {
             transform: translateY(-10px);
             box-shadow: 0px 15px 30px rgba(0,0,0,0.6);
         }
 
-        .car-info {
+         .car-info {
             padding: 15px;
             text-align: center;
         }
 
-        .price {
+         .price {
             color: #f39c12;
             margin-top: 5px;
         }
 
-        /* CTA */
-        .cta {
+        
+         .cta {
             background: linear-gradient(45deg, #000, #111);
             text-align: center;
             padding: 60px;
         }
 
-        .cta h2 {
+         .cta h2 {
             margin-bottom: 20px;
         }
 
-        /* FOOTER */
-        footer {
+        
+         footer {
             background: #000;
         }
-    </style>
+</style>
+
 </head>
 
 <body>
@@ -198,13 +198,11 @@ include 'includes/db.php';
 <!-- CTA -->
 <section class="cta">
     <h2>Envie de tester une voiture ?</h2>
-    <a href="reservation.php" class="btn-main">Réserver un essai</a>
+    <a href="presentation.php" class="btn-main">Réserver un essai</a>
 </section>
 
 <!-- FOOTER -->
-<footer class="text-center p-3">
-    <p>© 2026 SuperCar</p>
-</footer>
+<?php include 'includes/footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

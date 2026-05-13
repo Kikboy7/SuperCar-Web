@@ -1,28 +1,67 @@
 <?php
+// On demarre la session et on se connecte a la base.
 session_start();
 include 'includes/db.php';
 
 $message = "";
 
+// Si le formulaire est envoye, on cree un nouveau compte client.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $nom = $_POST['nom'];
-    $email = $_POST['email'];
+    $nom = trim($_POST['nom']);
+    $email = trim($_POST['email']);
+    $identifiant = trim($_POST['identifiant']);
     $password = $_POST['password'];
     $confirm = $_POST['confirm'];
 
-    // 🔥 Vérification
-    if ($password !== $confirm) {
+    if (empty($nom) || empty($email) || empty($identifiant) || empty($password)) {
+        $message = "Veuillez remplir tous les champs";
+    } elseif ($password !== $confirm) {
         $message = "Les mots de passe ne correspondent pas";
     } else {
+        // On verifie que l'identifiant ou l'email n'existe pas deja.
+        $stmt = $pdo->prepare("
+            SELECT l.id_login
+            FROM login l
+            JOIN client c ON l.id_client = c.id_client
+            WHERE l.identifiant = ? OR c.email = ?
+        ");
+        $stmt->execute([$identifiant, $email]);
 
-        // 🔒 Hash
-        $password_hash = password_hash($password, PASSWORD_DEFAULT);
+        if ($stmt->fetch()) {
+            $message = "Identifiant ou email deja utilise";
+        } else {
+            try {
+                // Le mot de passe est hash avant d'etre enregistre.
+                $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
-        $stmt = $pdo->prepare("INSERT INTO client (nom, email, mot_de_passe) VALUES (?, ?, ?)");
-        $stmt->execute([$nom, $email, $password_hash]);
+                // Transaction : les deux insertions doivent reussir ensemble.
+                $pdo->beginTransaction();
 
-        $message = "Compte créé !";
+                // 1. Creation de la fiche client.
+                $stmt = $pdo->prepare("INSERT INTO client (nom, email) VALUES (?, ?)");
+                $stmt->execute([$nom, $email]);
+
+                $id_client = $pdo->lastInsertId();
+
+                // 2. Creation du login lie au client.
+                $stmt = $pdo->prepare("
+                    INSERT INTO login (identifiant, mot_de_passe, id_client)
+                    VALUES (?, ?, ?)
+                ");
+                $stmt->execute([$identifiant, $password_hash, $id_client]);
+
+                $pdo->commit();
+
+                $message = "Compte cree ! Vous pouvez vous connecter.";
+            } catch (Exception $e) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+
+                $message = "Erreur lors de la creation du compte";
+            }
+        }
     }
 }
 ?>
@@ -31,92 +70,136 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html>
 <head>
 <title>Inscription</title>
-
 <style>
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #0f172a, #1e293b);
-    height: 100vh;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.82)),
+        url("images/background1.webp") center/cover no-repeat fixed;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    color: white;
+    padding: 24px;
+    box-sizing: border-box;
 }
 
-/* CONTAINER */
-.form-box {
-    background: rgba(20, 30, 50, 0.9);
-    padding: 40px;
-    border-radius: 15px;
-    width: 350px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+
+ .form-box {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(15, 15, 15, 0.92);
+    padding: 42px 38px;
+    border-radius: 8px;
+    border: 1px solid rgba(243, 156, 18, 0.25);
+    box-shadow: 0 25px 70px rgba(0,0,0,0.65);
+    backdrop-filter: blur(12px);
+    position: relative;
+    overflow: hidden;
 }
 
-/* TITRE */
-.form-box h2 {
+ .form-box::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: #f39c12;
+}
+
+
+ .form-box h2 {
     text-align: center;
-    margin-bottom: 30px;
-    color: #cbd5f5;
+    margin: 0 0 28px;
+    color: #fff;
+    font-size: 31px;
+    font-weight: 800;
+    letter-spacing: 0;
 }
 
-/* INPUT */
-.form-box input {
+
+ .form-box input {
     width: 100%;
-    padding: 14px;
+    padding: 15px 16px;
     margin-bottom: 15px;
-    border: none;
-    border-radius: 8px;
-    background: #0f172a;
+    border: 1px solid rgba(255,255,255,0.11);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.06);
     color: white;
-    font-size: 14px;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: 0.25s;
 }
 
-.form-box input::placeholder {
-    color: #94a3b8;
+ .form-box input::placeholder {
+    color: rgba(255,255,255,0.48);
 }
 
-/* FOCUS */
-.form-box input:focus {
+
+ .form-box input:focus {
     outline: none;
-    box-shadow: 0 0 0 2px #38bdf8;
+    border-color: #f39c12;
+    box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.16);
+    background: rgba(255,255,255,0.09);
 }
 
-/* BUTTON */
-.form-box button {
+
+ .form-box button {
     width: 100%;
-    padding: 14px;
-    background: #38bdf8;
+    padding: 15px;
+    background: #f39c12;
     border: none;
-    border-radius: 8px;
-    color: white;
-    font-weight: bold;
+    border-radius: 999px;
+    color: #111;
+    font-weight: 800;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.25s;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    margin-top: 5px;
 }
 
-.form-box button:hover {
-    background: #0ea5e9;
+ .form-box button:hover {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(243, 156, 18, 0.24);
 }
 
-/* LINK */
-.form-box a {
+
+ .form-box a {
     display: block;
     text-align: center;
-    margin-top: 15px;
-    color: #94a3b8;
+    margin-top: 20px;
+    color: #f39c12;
     text-decoration: none;
+    font-weight: 700;
+    transition: 0.25s;
 }
 
-.form-box a:hover {
+ .form-box a:hover {
     color: white;
 }
 
-/* MESSAGE */
-.message {
+
+ .message {
     text-align: center;
-    margin-bottom: 10px;
+    margin: 0 0 15px;
     color: #f87171;
+    min-height: 18px;
+    line-height: 1.4;
+}
+
+ @media (max-width: 480px) {
+.form-box {
+        padding: 32px 24px;
+    }
+
+     .form-box h2 {
+        font-size: 26px;
+    }
 }
 </style>
 
@@ -128,18 +211,19 @@ body {
 
 <h2>Créer un compte</h2>
 
-<p class="message"><?php echo $message; ?></p>
+<p class="message"><?php echo htmlspecialchars($message); ?></p>
 
 <form method="POST">
     <input type="text" name="nom" placeholder="Nom" required>
     <input type="email" name="email" placeholder="Email" required>
+    <input type="text" name="identifiant" placeholder="Identifiant" required>
     <input type="password" name="password" placeholder="Mot de passe" required>
     <input type="password" name="confirm" placeholder="Confirmer mot de passe" required>
 
     <button>S'inscrire</button>
 </form>
 
-<a href="login.php">Déjà un compte ?</a>
+<a href="login.php">D&eacute;j&agrave; un compte ?</a>
 
 </div>
 
