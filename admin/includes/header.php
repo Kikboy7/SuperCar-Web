@@ -160,6 +160,25 @@
             font-weight: bold;
         }
 
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 6px 0;
+        }
+
+        .badge-client {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .badge-visiteur {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
         @media (max-width: 900px) {
             .admin-layout {
                 flex-direction: column;

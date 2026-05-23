@@ -37,6 +37,11 @@ Le projet a deux parties :
 - id_voiture.
 
 `message` contient les messages envoyes depuis la page contact.
+Un message peut aussi contenir :
+- id_client, si le message vient d'un client connecte ;
+- statut_message ;
+- reponse_admin ;
+- date_reponse.
 
 `services` contient les services affiches sur la page services.
 
@@ -74,6 +79,13 @@ La page `essai.php` :
 
 La table `essai` ne stocke que la demande. Les informations personnelles restent dans `client`.
 
+La page `demande_essai.php` permet aussi de faire une demande d'essai, mais avec un formulaire plus complet :
+1. le client choisit la voiture dans une liste ;
+2. il choisit la date ;
+3. il choisit une heure entre 08:00 et 18:00 ;
+4. ses informations personnelles sont mises a jour ;
+5. la demande est ajoutee dans `essai`.
+
 ## Catalogue voitures
 
 La page `voitures.php` :
@@ -94,7 +106,8 @@ La page `detail.php` :
 
 La page `contact.php` :
 1. affiche les informations de contact ;
-2. enregistre le message du visiteur dans la table `message`.
+2. enregistre le message du visiteur dans la table `message` ;
+3. enregistre aussi `id_client` si le message vient d'un client connecte.
 
 ## Services
 
@@ -142,7 +155,12 @@ L'administrateur peut changer le statut :
 - refuse.
 
 `admin/messages.php` affiche les messages envoyes depuis la page contact.
-L'administrateur peut supprimer un message.
+L'administrateur peut :
+- voir si le message vient d'un visiteur ou d'un client connecte ;
+- changer le statut du message ;
+- enregistrer une reponse ou une note ;
+- repondre par email ;
+- supprimer un message.
 
 `admin/services.php` permet :
 - d'ajouter un service ;

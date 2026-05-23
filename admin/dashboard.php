@@ -7,6 +7,7 @@ $pageTitle = "Tableau de bord";
 $totalVoitures = $pdo->query("SELECT COUNT(*) FROM voiture")->fetchColumn();
 $totalEssais = $pdo->query("SELECT COUNT(*) FROM essai")->fetchColumn();
 $totalMessages = $pdo->query("SELECT COUNT(*) FROM message")->fetchColumn();
+$messagesNouveaux = $pdo->query("SELECT COUNT(*) FROM message WHERE statut_message = 'nouveau'")->fetchColumn();
 $totalServices = $pdo->query("SELECT COUNT(*) FROM services")->fetchColumn();
 
 include 'includes/header.php';
@@ -25,11 +26,12 @@ include 'includes/header.php';
         <a href="essais.php" class="btn">Voir</a>
     </div>
 
-    <div class="card">
-        <h3>Messages</h3>
-        <p><?php echo $totalMessages; ?> message(s)</p>
-        <a href="messages.php" class="btn">Consulter</a>
-    </div>
+	    <div class="card">
+	        <h3>Messages</h3>
+	        <p><?php echo $totalMessages; ?> message(s)</p>
+	        <p><?php echo $messagesNouveaux; ?> nouveau(x)</p>
+	        <a href="messages.php" class="btn">Consulter</a>
+	    </div>
 
     <div class="card">
         <h3>Services</h3>

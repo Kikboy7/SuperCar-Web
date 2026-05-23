@@ -5,7 +5,7 @@ include 'includes/db.php';
 $client = null;
 
 if (isset($_SESSION['client'])) {
-    $stmt = $pdo->prepare("SELECT nom FROM client WHERE id_client = ?");
+    $stmt = $pdo->prepare("SELECT nom, email FROM client WHERE id_client = ?");
     $stmt->execute([$_SESSION['client']]);
     $client = $stmt->fetch();
 }
@@ -18,15 +18,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nom = trim($_POST['nom']);
     $email = trim($_POST['email']);
     $contenu = trim($_POST['message']);
+    $id_client = $client ? $_SESSION['client'] : null;
 
     if (!empty($nom) && !empty($email) && !empty($contenu)) {
 
         $stmt = $pdo->prepare("
-            INSERT INTO message (nom, email, message, date_message)
-            VALUES (?, ?, ?, CURDATE())
+            INSERT INTO message (nom, email, message, date_message, id_client, statut_message)
+            VALUES (?, ?, ?, NOW(), ?, 'nouveau')
         ");
 
-        $stmt->execute([$nom, $email, $contenu]);
+        $stmt->execute([$nom, $email, $contenu, $id_client]);
 
         $success = "Votre message a bien été envoyé. Notre équipe vous répondra rapidement.";
     } else {
@@ -525,9 +526,11 @@ textarea:focus {
                 <?php } ?>
 
                 <form method="POST">
-                    <input type="text" name="nom" placeholder="Votre nom complet" required>
+                    <input type="text" name="nom" placeholder="Votre nom complet"
+                           value="<?php echo htmlspecialchars($client['nom'] ?? ''); ?>" required>
 
-                    <input type="email" name="email" placeholder="Votre adresse email" required>
+                    <input type="email" name="email" placeholder="Votre adresse email"
+                           value="<?php echo htmlspecialchars($client['email'] ?? ''); ?>" required>
 
                     <textarea name="message" placeholder="Décrivez votre demande..." required></textarea>
 

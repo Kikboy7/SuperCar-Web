@@ -134,7 +134,7 @@ body {
             <h1>Réservez votre essai</h1>
             <p>Vivez une expérience de conduite unique</p>
             <?php if ($isLogged) { ?>
-                <a href="voitures.php" class="btn">Choisir une voiture</a>
+	                <a href="demande_essai.php" class="btn">Demander un essai</a>
             <?php } else { ?>
                 <a href="login.php" class="btn">Se connecter</a>
             <?php } ?>
@@ -175,7 +175,7 @@ body {
         <div class="steps">
 
             <div class="step">
-                <a href="<?php echo $isLogged ? 'voitures.php' : 'login.php'; ?>">
+	                <a href="<?php echo $isLogged ? 'demande_essai.php' : 'login.php'; ?>">
                     <h3>1</h3>
                     <p><?php echo $isLogged ? 'Accéder au catalogue' : 'Créer un compte'; ?></p>
                 </a>

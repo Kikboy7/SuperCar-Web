@@ -80,7 +80,13 @@ CREATE TABLE message (
     nom VARCHAR(100) NOT NULL,
     email VARCHAR(150) NOT NULL,
     message TEXT NOT NULL,
-    date_message DATETIME DEFAULT CURRENT_TIMESTAMP
+    date_message DATETIME DEFAULT CURRENT_TIMESTAMP,
+    id_client INT NULL,
+    statut_message ENUM('nouveau', 'en cours', 'traite') DEFAULT 'nouveau',
+    reponse_admin TEXT,
+    date_reponse DATETIME,
+    FOREIGN KEY (id_client) REFERENCES client(id_client)
+        ON DELETE SET NULL
 );
 
 -- TABLE SERVICES

@@ -7,7 +7,7 @@ include 'db.php';
 $client = null;
 
 if (isset($_SESSION['client'])) {
-    $stmt = $pdo->prepare("SELECT nom FROM client WHERE id_client = ?");
+    $stmt = $pdo->prepare("SELECT nom, email FROM client WHERE id_client = ?");
     $stmt->execute([$_SESSION['client']]);
     $client = $stmt->fetch();
 }
@@ -107,7 +107,8 @@ if (isset($_SESSION['client'])) {
         <div class="nav-center">
             <a href="index.php">Accueil</a>
             <a href="voitures.php">Voitures</a>
-            <a href="reservation.php">Essai</a>
+	        <a href="demande_essai.php">Demander un essai</a>
+            <a href="reservation.php">Mes reservations</a>
             <a href="services.php">Services</a>
             <a href="contact.php">Contact</a>
         </div>
@@ -116,7 +117,7 @@ if (isset($_SESSION['client'])) {
         <div class="nav-right">
             <?php if ($client) { ?>
                 <span class="user">👤 <?php echo $client['nom']; ?></span>
-                <a href="logout.php">Logout</a>
+	                <a href="logout.php">Logout</a>
             <?php } else { ?>
                 <a href="login.php">Login</a>
             <?php } ?>
