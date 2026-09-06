@@ -4,29 +4,38 @@ session_start();
 
 // On utilise la meme connexion a la base que le reste du site.
 include '../includes/db.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 $message = "";
 
 // Si le formulaire est envoye, on essaie de connecter l'administrateur.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $identifiant = trim($_POST['identifiant']);
-    $password = $_POST['password'];
-
-    // On cherche un administrateur qui possede cet identifiant.
-    $stmt = $pdo->prepare("SELECT * FROM admin WHERE identifiant = ?");
-    $stmt->execute([$identifiant]);
-    $admin = $stmt->fetch();
-
-    // password_verify compare le mot de passe saisi avec le mot de passe hash en base.
-    if ($admin && password_verify($password, $admin['mot_de_passe'])) {
-        // Si la connexion est correcte, on garde l'id admin dans la session.
-        $_SESSION['admin'] = $admin['id_admin'];
-
-        header("Location: dashboard.php");
-        exit();
+    if (!csrf_verify()) {
+        $message = "Session de securite invalide, veuillez reessayer.";
     } else {
-        $message = "Identifiant ou mot de passe incorrect";
+        $identifiant = trim($_POST['identifiant']);
+        $password = $_POST['password'];
+
+        // On cherche un administrateur qui possede cet identifiant.
+        $stmt = $pdo->prepare("SELECT * FROM admin WHERE identifiant = ?");
+        $stmt->execute([$identifiant]);
+        $admin = $stmt->fetch();
+
+        // password_verify() compare le mot de passe saisi avec le mot de passe hash en base.
+        if ($admin && password_verify($password, $admin['mot_de_passe'])) {
+
+            // On change l'identifiant de session pour eviter la fixation de session.
+            session_regenerate_id(true);
+
+            // Si la connexion est correcte, on garde l'id admin dans la session.
+            $_SESSION['admin'] = $admin['id_admin'];
+
+            header("Location: dashboard.php");
+            exit();
+        } else {
+            $message = "Identifiant ou mot de passe incorrect";
+        }
     }
 }
 ?>
@@ -142,6 +151,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php } ?>
 
         <form method="POST">
+            <?php echo csrf_field(); ?>
             <input type="text" name="identifiant" placeholder="Identifiant" required>
             <input type="password" name="password" placeholder="Mot de passe" required>
 

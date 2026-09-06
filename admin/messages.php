@@ -4,30 +4,38 @@ include 'includes/auth.php';
 $pageTitle = "Messages";
 $messageInfo = "";
 
-// Suppression d'un message.
-if (isset($_GET['delete'])) {
-    $id_message = $_GET['delete'];
+// Suppression d'un message (formulaire POST protege par CSRF).
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['supprimer_message'])) {
+    if (!csrf_verify()) {
+        $messageInfo = "Session de securite invalide.";
+    } else {
+        $id_message = (int) $_POST['supprimer_message'];
 
-    $stmt = $pdo->prepare("DELETE FROM message WHERE id_message = ?");
-    $stmt->execute([$id_message]);
+        $stmt = $pdo->prepare("DELETE FROM message WHERE id_message = ?");
+        $stmt->execute([$id_message]);
 
-    $messageInfo = "Message supprime.";
+        $messageInfo = "Message supprime.";
+    }
 }
 
 // Reponse ou changement de statut d'un message.
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $id_message = $_POST['id_message'];
-    $statut = $_POST['statut_message'];
-    $reponse = trim($_POST['reponse_admin']);
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_message'])) {
+    if (!csrf_verify()) {
+        $messageInfo = "Session de securite invalide.";
+    } else {
+        $id_message = $_POST['id_message'];
+        $statut = $_POST['statut_message'];
+        $reponse = trim($_POST['reponse_admin']);
 
-    $stmt = $pdo->prepare("
-        UPDATE message
-        SET statut_message = ?, reponse_admin = ?, date_reponse = NOW()
-        WHERE id_message = ?
-    ");
-    $stmt->execute([$statut, $reponse, $id_message]);
+        $stmt = $pdo->prepare("
+            UPDATE message
+            SET statut_message = ?, reponse_admin = ?, date_reponse = NOW()
+            WHERE id_message = ?
+        ");
+        $stmt->execute([$statut, $reponse, $id_message]);
 
-    $messageInfo = "Message mis a jour.";
+        $messageInfo = "Message mis a jour.";
+    }
 }
 
 // On recupere les messages avec le client associe si le message vient d'un compte connecte.
@@ -79,6 +87,7 @@ include 'includes/header.php';
 
                 <td>
                     <form method="POST">
+                        <?php echo csrf_field(); ?>
                         <input type="hidden" name="id_message" value="<?php echo $msg['id_message']; ?>">
 
                         <select name="statut_message">
@@ -102,10 +111,15 @@ include 'includes/header.php';
                         Repondre par email
                     </a>
 
-                    <a class="btn btn-danger" href="messages.php?delete=<?php echo $msg['id_message']; ?>"
-                       onclick="return confirm('Supprimer ce message ?');">
+                    <a class="btn btn-danger" href="javascript:void(0)"
+                       onclick="document.getElementById('del-<?php echo $msg['id_message']; ?>').submit(); return false;">
                         Supprimer
                     </a>
+
+                    <form method="POST" id="del-<?php echo $msg['id_message']; ?>" style="display:none;">
+                        <?php echo csrf_field(); ?>
+                        <input type="hidden" name="supprimer_message" value="<?php echo $msg['id_message']; ?>">
+                    </form>
                 </td>
             </tr>
         <?php } ?>

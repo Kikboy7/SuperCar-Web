@@ -1,75 +1,1033 @@
+/* =====================================================================
+   style.css - Feuille de style globale SuperCar
+   Design : theme sombre premium avec accent orange (#f39c12).
+   Utilise les variables CSS pour centraliser les couleurs.
+   ===================================================================== */
+
+/* ------------------------- VARIABLES ------------------------- */
+:root {
+    --noir:        #0a0a0a;
+    --noir-2:      #121212;
+    --carte:       #161616;
+    --carte-2:     #1d1d1d;
+    --bordure:     #2a2a2a;
+    --accent:      #f39c12;
+    --accent-2:    #ffc34d;
+    --texte:       #f5f5f5;
+    --texte-2:     #a3a3a3;
+    --texte-3:     #6f6f6f;
+    --success:     #22c55e;
+    --danger:      #ef4444;
+    --info:        #f59e0b;
+    --rayon:       14px;
+    --transition:  .3s ease;
+    --font-titre:  'Sora', 'Segoe UI', Arial, sans-serif;
+    --font-texte:  'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+/* ------------------------- BASE ------------------------- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
 body {
-    font-family: Arial, sans-serif;
+    background: var(--noir);
+    color: var(--texte);
+    font-family: var(--font-texte);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* HERO */
-.hero {
-    height: 90vh;
-    background-image: url("images/background.webp");
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
-    position: relative;
+img { max-width: 100%; display: block; }
+
+a { color: var(--accent); text-decoration: none; transition: color var(--transition); }
+a:hover { color: var(--accent-2); }
+
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-titre); font-weight: 700; line-height: 1.2; }
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-.overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+main { min-height: 60vh; }
+
+section { position: relative; }
+
+/* ------------------------- TITRES DE SECTION ------------------------- */
+.section { padding: 80px 0; }
+
+.section-head {
     text-align: center;
-    color: white;
+    max-width: 700px;
+    margin: 0 auto 50px;
 }
 
-.overlay h1 {
-    font-size: 50px;
-    font-weight: bold;
+.section-tag {
+    display: inline-block;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 12px;
 }
 
-.overlay p {
-    font-size: 20px;
+.section-title {
+    font-size: clamp(28px, 4vw, 42px);
+    margin-bottom: 14px;
+}
+
+.section-sub { color: var(--texte-2); font-size: 16px; }
+
+/* ------------------------- BOUTONS ------------------------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 26px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 15px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all var(--transition);
+    text-decoration: none;
+    background: none;
+    font-family: var(--font-texte);
+}
+
+.btn-main {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #141414;
+}
+.btn-main:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(243, 156, 18, 0.35); color: #141414; }
+
+.btn-outline { border-color: #3a3a3a; color: var(--texte); }
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+.btn-ghost { color: var(--texte-2); }
+.btn-ghost:hover { color: var(--accent); }
+
+.btn-block { width: 100%; }
+
+.btn-sm { padding: 8px 16px; font-size: 13px; }
+
+/* ------------------------- NAVBAR ------------------------- */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(8, 8, 8, 0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.navbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 78px;
+}
+
+.navbar .logo { display: inline-flex; align-items: center; flex-shrink: 0; }
+.navbar .logo img { height: 52px; }
+
+/* Bloc repliable (menu + compte) sur mobile */
+.nav-collapse {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 18px;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    list-style: none;
+    flex: 1;
+}
+
+.nav-links a {
+    color: var(--texte-2);
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    position: relative;
+    white-space: nowrap;
+}
+
+/* Petit trait sous le lien au survol et pour la page active */
+.nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 7px;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transition: transform .25s ease;
+}
+
+.nav-links a:hover { color: #fff; }
+.nav-links a:hover::after,
+.nav-links a.active::after { transform: scaleX(1); }
+
+.nav-links .active { color: var(--accent); }
+
+/* Zone compte : separee du menu par un trait vertical */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-left: 18px;
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+    flex-shrink: 0;
+}
+
+.nav-user {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 14.5px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    transition: background var(--transition);
+    white-space: nowrap;
+}
+.nav-user:hover { background: rgba(243, 156, 18, 0.12); color: var(--accent-2); }
+
+/* Burger menu (mobile) */
+.nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+}
+.nav-toggle span,
+.nav-toggle span::before,
+.nav-toggle span::after {
+    content: "";
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: #fff;
+    border-radius: 2px;
+    transition: all .3s ease;
+}
+.nav-toggle span { position: relative; }
+.nav-toggle span::before { position: absolute; top: -7px; }
+.nav-toggle span::after  { position: absolute; top: 7px; }
+
+@media (max-width: 900px) {
+    .nav-toggle { display: block; }
+
+    .nav-collapse {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+        background: rgba(10, 10, 10, 0.98);
+        padding: 16px 20px 22px;
+        border-bottom: 1px solid var(--bordure);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+    .nav-collapse.open { display: flex; }
+
+    .nav-links {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 2px;
+    }
+    .nav-links a { display: block; padding: 14px 12px; }
+    .nav-links a::after { display: none; }
+
+    .nav-actions {
+        border-left: none;
+        padding-left: 0;
+        padding-top: 12px;
+        margin-top: 8px;
+        border-top: 1px solid var(--bordure);
+        flex-wrap: wrap;
+    }
+    .nav-actions .btn { flex: 1; }
+}
+
+/* ------------------------- HERO + CARROUSEL ------------------------- */
+.hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 92vh;
+    display: flex;
+    align-items: center;
+    background: #0a0a0a;
+}
+
+/* Calque du carrousel (images de fond) */
+.hero-slider {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.hero-slide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transform: scale(1.06);
+    transition: opacity .8s ease, transform 6s ease;
+}
+
+.hero-slide.is-active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Voile sombre au-dessus des images pour la lisibilite */
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+        linear-gradient(90deg, rgba(0,0,0,0.85), rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.3)),
+        linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.6));
+    pointer-events: none;
+}
+
+/* Fleches du carrousel */
+.hero-slider-btn {
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 50%;
+    color: #fff;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(6px);
+    cursor: pointer;
+    font-size: 24px;
+    line-height: 1;
+    transition: all .25s ease;
+}
+
+.hero-slider-btn:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #141414;
+}
+
+.hero-slider-prev { left: 22px; }
+.hero-slider-next { right: 22px; }
+
+/* Points de navigation du carrousel */
+.hero-slider-dots {
+    position: absolute;
+    z-index: 3;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 9px;
+}
+
+.hero-slider-dots button {
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.4);
+    cursor: pointer;
+    transition: all .25s ease;
+}
+
+.hero-slider-dots button.is-active {
+    background: var(--accent);
+    transform: scale(1.2);
+}
+
+/* Contenu au-dessus du carrousel */
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 760px;
+}
+
+.hero-tag {
+    display: inline-block;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    font-size: 13px;
+    font-weight: 700;
     margin-bottom: 20px;
 }
 
-/* CARDS */
-.car-card {
-    background: white;
-    padding: 15px;
-    text-align: center;
-    transition: 0.3s;
-    border-radius: 15px;
-    height: 100%;
+.hero h1 {
+    font-size: clamp(38px, 6vw, 68px);
+    margin-bottom: 20px;
 }
 
-.car-card img {
-    width: 100%;
-    border-radius: 10px;
-    height: 200px;
-    object-fit: cover;
-    transition: 0.3s;
+.hero h1 span { color: var(--accent); }
+
+.hero p {
+    font-size: 19px;
+    color: var(--texte-2);
+    margin-bottom: 34px;
+    max-width: 560px;
+}
+
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 60px;
+    max-width: 620px;
+}
+
+.stat {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 18px 20px;
+    text-align: center;
+    backdrop-filter: blur(6px);
+}
+
+.stat strong { display: block; font-size: 30px; color: var(--accent); font-family: var(--font-titre); }
+.stat span { font-size: 13px; color: var(--texte-2); }
+
+@media (max-width: 600px) {
+    .hero-stats { grid-template-columns: 1fr; }
+    .hero { min-height: 80vh; }
+    .hero-slider-btn { width: 40px; height: 40px; font-size: 20px; }
+    .hero-slider-prev { left: 12px; }
+    .hero-slider-next { right: 12px; }
+}
+
+/* ------------------------- CARTES VOITURES ------------------------- */
+.car-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 26px;
+}
+
+.car-card {
+    background: var(--carte);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    overflow: hidden;
+    transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    display: flex;
+    flex-direction: column;
 }
 
 .car-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0px 10px 20px rgba(0,0,0,0.2);
+    transform: translateY(-8px);
+    border-color: rgba(243,156,18,0.5);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.55);
 }
 
-.car-card:hover img {
-    transform: scale(1.05);
+.car-card .thumb {
+    position: relative;
+    aspect-ratio: 16/10;
+    overflow: hidden;
 }
 
-/* CTA */
-.cta {
-    background: black;
-    color: white;
-    padding: 50px;
-}
-
-.hero::before {
-    content: "";
-    position: absolute;
+.car-card .thumb img {
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    object-fit: cover;
+    transition: transform .5s ease;
 }
 
+.car-card:hover .thumb img { transform: scale(1.08); }
+
+.car-card .brand-chip {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(6px);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 6px 12px;
+    border-radius: 999px;
+}
+
+.car-card .body { padding: 20px; display: flex; flex-direction: column; flex: 1; }
+
+.car-card h3 { font-size: 21px; margin-bottom: 6px; }
+
+.car-card .price { font-size: 20px; color: var(--accent); font-weight: 800; margin-bottom: 14px; }
+
+.car-card .specs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.spec-chip {
+    background: var(--carte-2);
+    border: 1px solid var(--bordure);
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--texte-2);
+}
+
+.car-card .actions { margin-top: auto; display: flex; gap: 10px; }
+.car-card .actions .btn { flex: 1; padding: 10px 14px; font-size: 14px; }
+
+/* ------------------------- FILTRES CATALOGUE ------------------------- */
+.filters {
+    background: var(--carte);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    padding: 22px;
+    margin-bottom: 40px;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: end;
+}
+
+.filters .field { flex: 1; min-width: 200px; }
+
+.filters label {
+    display: block;
+    font-size: 12px;
+    color: var(--texte-2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 7px;
+}
+
+/* ------------------------- PAGINATION ------------------------- */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 50px;
+    flex-wrap: wrap;
+}
+
+.pagination a,
+.pagination span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    height: 42px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid var(--bordure);
+    color: var(--texte-2);
+    font-weight: 600;
+    transition: all var(--transition);
+}
+
+.pagination a:hover { border-color: var(--accent); color: var(--accent); }
+
+.pagination .current {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #141414;
+}
+
+/* ------------------------- DETAIL VOITURE ------------------------- */
+.detail-page { padding: 60px 0; }
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 50px;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .detail-grid { grid-template-columns: 1fr; }
+}
+
+.gallery-main {
+    border-radius: var(--rayon);
+    overflow: hidden;
+    aspect-ratio: 16/10;
+    background: var(--carte);
+    border: 1px solid var(--bordure);
+}
+
+.gallery-main img { width: 100%; height: 100%; object-fit: cover; transition: opacity .2s; }
+
+.gallery-thumbs {
+    display: flex;
+    gap: 12px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
+
+.gallery-thumbs img {
+    width: 90px;
+    height: 68px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid var(--bordure);
+    cursor: pointer;
+    opacity: .65;
+    transition: all var(--transition);
+}
+
+.gallery-thumbs img:hover,
+.gallery-thumbs img.active { opacity: 1; border-color: var(--accent); }
+
+.detail-title { font-size: clamp(30px, 4vw, 44px); margin-bottom: 6px; }
+
+.detail-brand { color: var(--accent); text-transform: uppercase; letter-spacing: 2px; font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+
+.detail-price { font-size: 30px; font-weight: 800; color: var(--accent); margin: 14px 0; }
+
+.detail-desc { color: var(--texte-2); line-height: 1.8; margin-bottom: 26px; }
+
+.specs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 600px) { .specs-grid { grid-template-columns: 1fr; } }
+
+.spec-box {
+    background: var(--carte);
+    border: 1px solid var(--bordure);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.spec-box span { display: block; color: var(--texte-3); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.spec-box strong { font-size: 16px; }
+
+.detail-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* ------------------------- SERVICES ------------------------- */
+.service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 26px;
+}
+
+.service-card {
+    background: var(--carte);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    transition: all var(--transition);
+}
+
+.service-card:hover { transform: translateY(-6px); border-color: rgba(243,156,18,0.5); }
+
+.service-num {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #141414;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.service-card h3 { margin-bottom: 12px; font-size: 20px; }
+.service-card p { color: var(--texte-2); flex: 1; margin-bottom: 20px; }
+.service-price { color: var(--accent); font-weight: 800; }
+
+/* ------------------------- MESSAGES SUCCES / ERREUR ------------------------- */
+.alert {
+    padding: 14px 18px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-size: 14.5px;
+}
+
+.alert-success { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.4); color: #86efac; }
+.alert-error   { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.4); color: #fca5a5; }
+
+/* ------------------------- FORMULAIRES ------------------------- */
+.form-card {
+    background: var(--carte);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    padding: 34px;
+    max-width: 620px;
+    margin: 0 auto;
+}
+
+.form-card.wide { max-width: 800px; }
+
+.form-title { text-align: center; margin-bottom: 6px; font-size: 28px; }
+.form-intro { text-align: center; color: var(--texte-2); margin-bottom: 26px; }
+
+.form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+@media (max-width: 700px) { .form-row { grid-template-columns: 1fr; } }
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 13px 15px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    border: 1px solid var(--bordure);
+    background: var(--carte-2);
+    color: var(--texte);
+    font-size: 15px;
+    font-family: var(--font-texte);
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+input::placeholder, textarea::placeholder { color: var(--texte-3); }
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(243,156,18,0.15);
+}
+
+textarea { min-height: 140px; resize: vertical; }
+
+.form-note { font-size: 13px; color: var(--texte-3); text-align: center; margin-top: 16px; }
+.form-note a { color: var(--accent); }
+
+/* Auth box (login / register) */
+.auth-wrap {
+    min-height: 88vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.auth-box { max-width: 420px; width: 100%; }
+.auth-box .form-card { padding: 40px 34px; }
+.auth-box h2 { text-align: center; font-size: 30px; margin-bottom: 6px; }
+.auth-sub { text-align: center; color: var(--texte-2); margin-bottom: 26px; font-size: 14px; }
+
+/* ------------------------- BADGES STATUT ------------------------- */
+.badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+.badge-en-attente { background: rgba(245,158,11,0.15); color: var(--info); }
+.badge-valide     { background: rgba(34,197,94,0.15); color: var(--success); }
+.badge-refuse     { background: rgba(239,68,68,0.15); color: var(--danger); }
+.badge-nouveau    { background: rgba(245,158,11,0.15); color: var(--info); }
+
+/* ------------------------- RESERVATIONS ------------------------- */
+.reservation-card {
+    background: var(--carte);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    padding: 22px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 18px;
+    transition: border-color var(--transition);
+}
+
+.reservation-card:hover { border-color: rgba(243,156,18,0.4); }
+
+.reservation-card img {
+    width: 150px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+    .reservation-card { flex-direction: column; text-align: center; }
+    .reservation-card img { width: 100%; height: auto; }
+}
+
+.reservation-info { flex: 1; }
+.reservation-info h3 { margin-bottom: 6px; }
+.reservation-info p { color: var(--texte-2); font-size: 14.5px; margin-bottom: 4px; }
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--texte-2);
+    background: var(--carte);
+    border: 1px dashed var(--bordure);
+    border-radius: var(--rayon);
+}
+.empty-state h3 { color: var(--texte); margin-bottom: 8px; }
+
+/* ------------------------- CTA BANNER ------------------------- */
+.cta-banner {
+    background: linear-gradient(135deg, rgba(243,156,18,0.12), rgba(0,0,0,0.4)), url("images/background2.png") center/cover no-repeat fixed;
+    padding: 90px 20px;
+    text-align: center;
+    border-top: 1px solid var(--bordure);
+    border-bottom: 1px solid var(--bordure);
+}
+
+.cta-banner h2 { font-size: clamp(28px, 4vw, 42px); margin-bottom: 12px; }
+.cta-banner p { color: var(--texte-2); margin-bottom: 30px; }
+.cta-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+/* ------------------------- PAGE HERO (interne) ------------------------- */
+.page-hero {
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.78)), url("images/background3.png") center/cover no-repeat;
+    padding: 90px 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--bordure);
+}
+
+.page-hero h1 { font-size: clamp(32px, 5vw, 52px); margin-bottom: 12px; }
+.page-hero p { color: var(--texte-2); max-width: 640px; margin: 0 auto; font-size: 17px; }
+
+/* ------------------------- STEPPERS (presentation) ------------------------- */
+.steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 40px;
+}
+
+@media (max-width: 800px) { .steps { grid-template-columns: 1fr; } }
+
+.step-card {
+    background: var(--carte);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    padding: 30px;
+    text-align: center;
+    transition: all var(--transition);
+}
+
+.step-card:hover { transform: translateY(-6px); border-color: rgba(243,156,18,0.5); }
+
+.step-card .num {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #141414;
+    font-weight: 800;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.step-card h3 { margin-bottom: 10px; }
+.step-card p { color: var(--texte-2); }
+
+/* ------------------------- MARQUES ------------------------- */
+.brand-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+@media (max-width: 800px) { .brand-grid { grid-template-columns: 1fr; } }
+
+.brand-card {
+    position: relative;
+    border-radius: var(--rayon);
+    overflow: hidden;
+    border: 1px solid var(--bordure);
+    transition: all var(--transition);
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .55; transition: all .4s ease; }
+.brand-card:hover img { opacity: .35; transform: scale(1.06); }
+.brand-card:hover { border-color: rgba(243,156,18,0.55); }
+
+.brand-card .overlay {
+    position: relative;
+    text-align: center;
+    z-index: 1;
+    padding: 30px;
+}
+
+.brand-card h3 { font-size: 26px; text-transform: uppercase; letter-spacing: 2px; }
+.brand-card p { color: var(--accent); font-weight: 600; margin-top: 4px; }
+
+/* ------------------------- CONTACT ------------------------- */
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+@media (max-width: 900px) { .contact-grid { grid-template-columns: 1fr; } }
+
+.info-card {
+    background: var(--carte);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    padding: 24px;
+    margin-bottom: 18px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    transition: border-color var(--transition);
+}
+.info-card:hover { border-color: rgba(243,156,18,0.4); }
+.info-card .icon { font-size: 24px; }
+.info-card h3 { font-size: 16px; margin-bottom: 3px; }
+.info-card p { color: var(--texte-2); font-size: 14.5px; }
+
+.map-frame {
+    width: 100%;
+    height: 320px;
+    border: 0;
+    border-radius: var(--rayon);
+    filter: grayscale(30%);
+}
+
+/* ------------------------- COMPTE (onglets + profil) ------------------------- */
+.account-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 28px;
+    background: var(--carte);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    padding: 6px;
+    max-width: 480px;
+}
+
+.account-tabs button {
+    flex: 1;
+    padding: 12px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--texte-2);
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all .25s ease;
+}
+
+.account-tabs button.is-active {
+    background: var(--accent);
+    color: #141414;
+}
+
+.account-tabs button:hover:not(.is-active) { color: #fff; }
+
+.account-panel { display: none; }
+.account-panel.is-active { display: block; animation: fadeUp .4s ease both; }
+
+.account-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 26px;
+    align-items: start;
+}
+
+.profile-card {
+    background: var(--carte);
+    border: 1px solid var(--bordure);
+    border-radius: var(--rayon);
+    padding: 28px;
+    text-align: center;
+}
+
+.profile-avatar {
+    width: 92px;
+    height: 92px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #141414;
+    font-family: var(--font-titre);
+    font-size: 34px;
+    font-weight: 700;
+}
+
+.profile-card h2 { font-size: 20px; margin-bottom: 4px; }
+.profile-card .muted { font-size: 14px; margin-bottom: 20px; }
+
+.profile-meta {
+    text-align: left;
+    border-top: 1px solid var(--bordure);
+    padding-top: 18px;
+    margin-top: 18px;
+    display: grid;
+    gap: 10px;
+}
+
+.profile-meta div { font-size: 14px; color: var(--texte-2); }
+.profile-meta strong { color: #fff; display: block; font-weight: 600; }
+
+@media (max-width: 760px) {
+    .account-grid { grid-template-columns: 1fr; }
+}
+
+/* ------------------------- ANIMATIONS ------------------------- */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-up { animation: fadeUp .7s ease both; }
+.delay-1 { animation-delay: .12s; }
+.delay-2 { animation-delay: .24s; }
+.delay-3 { animation-delay: .36s; }
+
+/* ------------------------- UTILITAIRES ------------------------- */
+.text-center { text-align: center; }
+.mt-2 { margin-top: 20px; }
+.mt-4 { margin-top: 40px; }
+.mb-2 { margin-bottom: 20px; }
+.mb-4 { margin-bottom: 40px; }
+
+.muted { color: var(--texte-2); }
+.accent { color: var(--accent); }
+
+/* ------------------------- RESPONSIVE GLOBAL ------------------------- */
+@media (max-width: 600px) {
+    .section { padding: 56px 0; }
+    .hero { min-height: 80vh; }
+}

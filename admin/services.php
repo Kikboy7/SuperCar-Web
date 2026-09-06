@@ -5,35 +5,43 @@ $pageTitle = "Services";
 $message = "";
 
 // Ajouter ou modifier un service.
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $id_services = $_POST['id_services'] ?? "";
-    $nom = trim($_POST['nom_services']);
-    $description = trim($_POST['description_services']);
-    $prix = $_POST['prix_services'];
-
-    if ($id_services) {
-        $stmt = $pdo->prepare("
-            UPDATE services
-            SET nom_services = ?, description_services = ?, prix_services = ?
-            WHERE id_services = ?
-        ");
-        $stmt->execute([$nom, $description, $prix, $id_services]);
-        $message = "Service modifie.";
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['nom_services'])) {
+    if (!csrf_verify()) {
+        $message = "Session de securite invalide.";
     } else {
-        $stmt = $pdo->prepare("
-            INSERT INTO services (nom_services, description_services, prix_services)
-            VALUES (?, ?, ?)
-        ");
-        $stmt->execute([$nom, $description, $prix]);
-        $message = "Service ajoute.";
+        $id_services = $_POST['id_services'] ?? "";
+        $nom = trim($_POST['nom_services']);
+        $description = trim($_POST['description_services']);
+        $prix = $_POST['prix_services'];
+
+        if ($id_services) {
+            $stmt = $pdo->prepare("
+                UPDATE services
+                SET nom_services = ?, description_services = ?, prix_services = ?
+                WHERE id_services = ?
+            ");
+            $stmt->execute([$nom, $description, $prix, $id_services]);
+            $message = "Service modifie.";
+        } else {
+            $stmt = $pdo->prepare("
+                INSERT INTO services (nom_services, description_services, prix_services)
+                VALUES (?, ?, ?)
+            ");
+            $stmt->execute([$nom, $description, $prix]);
+            $message = "Service ajoute.";
+        }
     }
 }
 
-// Supprimer un service.
-if (isset($_GET['delete'])) {
-    $stmt = $pdo->prepare("DELETE FROM services WHERE id_services = ?");
-    $stmt->execute([$_GET['delete']]);
-    $message = "Service supprime.";
+// Supprimer un service (formulaire POST protege par CSRF).
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['supprimer_service'])) {
+    if (!csrf_verify()) {
+        $message = "Session de securite invalide.";
+    } else {
+        $stmt = $pdo->prepare("DELETE FROM services WHERE id_services = ?");
+        $stmt->execute([(int) $_POST['supprimer_service']]);
+        $message = "Service supprime.";
+    }
 }
 
 // Si on clique sur modifier, on recupere le service a afficher dans le formulaire.
@@ -57,6 +65,7 @@ include 'includes/header.php';
     <h2><?php echo $serviceEdit ? "Modifier un service" : "Ajouter un service"; ?></h2>
 
     <form method="POST">
+        <?php echo csrf_field(); ?>
         <input type="hidden" name="id_services" value="<?php echo $serviceEdit['id_services'] ?? ''; ?>">
 
         <input type="text" name="nom_services" placeholder="Nom du service"
@@ -92,10 +101,15 @@ include 'includes/header.php';
                 <td>Rs <?php echo number_format($service['prix_services'], 0, ',', ' '); ?></td>
                 <td>
                     <a class="btn" href="services.php?edit=<?php echo $service['id_services']; ?>">Modifier</a>
-                    <a class="btn btn-danger" href="services.php?delete=<?php echo $service['id_services']; ?>"
-                       onclick="return confirm('Supprimer ce service ?');">
-                        Supprimer
-                    </a>
+
+                    <form method="POST" style="display:inline;">
+                        <?php echo csrf_field(); ?>
+                        <input type="hidden" name="supprimer_service" value="<?php echo $service['id_services']; ?>">
+                        <button class="btn btn-danger" type="submit"
+                                onclick="return confirm('Supprimer ce service ?');">
+                            Supprimer
+                        </button>
+                    </form>
                 </td>
             </tr>
         <?php } ?>

@@ -5,43 +5,57 @@ $pageTitle = "Voitures";
 $message = "";
 
 // Ajouter ou modifier une voiture.
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $id_voiture = $_POST['id_voiture'] ?? "";
-    $modele = trim($_POST['modele']);
-    $prix = $_POST['prix'];
-    $description = trim($_POST['description']);
-    $image = trim($_POST['image']);
-    $id_marque = $_POST['id_marque'];
-
-    if ($id_voiture) {
-        $stmt = $pdo->prepare("
-            UPDATE voiture
-            SET modele = ?, prix = ?, description = ?, image = ?, id_marque = ?
-            WHERE id_voiture = ?
-        ");
-        $stmt->execute([$modele, $prix, $description, $image, $id_marque, $id_voiture]);
-        $message = "Voiture modifiee.";
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['modele'])) {
+    if (!csrf_verify()) {
+        $message = "Session de securite invalide.";
     } else {
-        $stmt = $pdo->prepare("
-            INSERT INTO voiture (modele, prix, description, image, id_marque)
-            VALUES (?, ?, ?, ?, ?)
-        ");
-        $stmt->execute([$modele, $prix, $description, $image, $id_marque]);
-        $message = "Voiture ajoutee.";
+        $id_voiture  = $_POST['id_voiture'] ?? "";
+        $modele      = trim($_POST['modele']);
+        $prix        = $_POST['prix'];
+        $description = trim($_POST['description']);
+        $image       = trim($_POST['image']);
+        $id_marque   = $_POST['id_marque'];
+        $annee       = $_POST['annee'] !== '' ? (int) $_POST['annee'] : null;
+        $carburant   = trim($_POST['carburant']);
+        $boite       = trim($_POST['boite']);
+        $puissance   = $_POST['puissance'] !== '' ? (int) $_POST['puissance'] : null;
+
+        if ($id_voiture) {
+            $stmt = $pdo->prepare("
+                UPDATE voiture
+                SET modele = ?, prix = ?, description = ?, image = ?, id_marque = ?,
+                    annee = ?, carburant = ?, boite = ?, puissance = ?
+                WHERE id_voiture = ?
+            ");
+            $stmt->execute([$modele, $prix, $description, $image, $id_marque, $annee, $carburant, $boite, $puissance, $id_voiture]);
+            $message = "Voiture modifiee.";
+        } else {
+            $stmt = $pdo->prepare("
+                INSERT INTO voiture (modele, prix, description, image, id_marque, annee, carburant, boite, puissance)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+            $stmt->execute([$modele, $prix, $description, $image, $id_marque, $annee, $carburant, $boite, $puissance]);
+            $message = "Voiture ajoutee.";
+        }
     }
 }
 
-// Supprimer une voiture.
-if (isset($_GET['delete'])) {
-    $id_voiture = $_GET['delete'];
+// Supprimer une voiture (formulaire POST protege par CSRF).
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['supprimer_voiture'])) {
+    if (!csrf_verify()) {
+        $message = "Session de securite invalide.";
+    } else {
+        $id_voiture = (int) $_POST['supprimer_voiture'];
 
-    $stmt = $pdo->prepare("DELETE FROM voiture_image WHERE id_voiture = ?");
-    $stmt->execute([$id_voiture]);
+        // On supprime d'abord les images liees puis la voiture (contrainte de cle etrangere).
+        $stmt = $pdo->prepare("DELETE FROM voiture_image WHERE id_voiture = ?");
+        $stmt->execute([$id_voiture]);
 
-    $stmt = $pdo->prepare("DELETE FROM voiture WHERE id_voiture = ?");
-    $stmt->execute([$id_voiture]);
+        $stmt = $pdo->prepare("DELETE FROM voiture WHERE id_voiture = ?");
+        $stmt->execute([$id_voiture]);
 
-    $message = "Voiture supprimee.";
+        $message = "Voiture supprimee.";
+    }
 }
 
 // Recuperer une voiture pour la modifier.
@@ -73,7 +87,8 @@ include 'includes/header.php';
     <h2><?php echo $voitureEdit ? "Modifier une voiture" : "Ajouter une voiture"; ?></h2>
 
     <form method="POST">
-        <input type="hidden" name="id_voiture" value="<?php echo $voitureEdit['id_voiture'] ?? ''; ?>">
+        <?php echo csrf_field(); ?>
+        <input type="hidden" name="id_voiture" value="<?php echo htmlspecialchars($voitureEdit['id_voiture'] ?? ''); ?>">
 
         <div class="form-grid">
             <div>
@@ -82,8 +97,8 @@ include 'includes/header.php';
             </div>
 
             <div>
-                <label>Prix</label>
-                <input type="number" name="prix" value="<?php echo htmlspecialchars($voitureEdit['prix'] ?? ''); ?>" required>
+                <label>Prix (Rs)</label>
+                <input type="number" name="prix" min="0" value="<?php echo htmlspecialchars($voitureEdit['prix'] ?? ''); ?>" required>
             </div>
 
             <div>
@@ -102,6 +117,42 @@ include 'includes/header.php';
                 <label>Image principale</label>
                 <input type="text" name="image" placeholder="exemple.jpg"
                        value="<?php echo htmlspecialchars($voitureEdit['image'] ?? ''); ?>">
+            </div>
+
+            <div>
+                <label>Ann&eacute;e</label>
+                <input type="number" name="annee" min="1980" max="2030" placeholder="2024"
+                       value="<?php echo htmlspecialchars($voitureEdit['annee'] ?? ''); ?>">
+            </div>
+
+            <div>
+                <label>Puissance (ch)</label>
+                <input type="number" name="puissance" min="0" placeholder="510"
+                       value="<?php echo htmlspecialchars($voitureEdit['puissance'] ?? ''); ?>">
+            </div>
+
+            <div>
+                <label>Carburant</label>
+                <select name="carburant">
+                    <option value="">-- Choisir --</option>
+                    <?php foreach (['Essence', 'Diesel', 'Hybride', 'Electrique'] as $c) { ?>
+                        <option value="<?php echo $c; ?>" <?php if (($voitureEdit['carburant'] ?? '') == $c) echo 'selected'; ?>>
+                            <?php echo $c; ?>
+                        </option>
+                    <?php } ?>
+                </select>
+            </div>
+
+            <div>
+                <label>Bo&icirc;te de vitesses</label>
+                <select name="boite">
+                    <option value="">-- Choisir --</option>
+                    <?php foreach (['Automatique', 'Manuelle'] as $b) { ?>
+                        <option value="<?php echo $b; ?>" <?php if (($voitureEdit['boite'] ?? '') == $b) echo 'selected'; ?>>
+                            <?php echo $b; ?>
+                        </option>
+                    <?php } ?>
+                </select>
             </div>
         </div>
 
@@ -124,6 +175,7 @@ include 'includes/header.php';
             <th>Marque</th>
             <th>Modele</th>
             <th>Prix</th>
+            <th>Caracteristiques</th>
             <th>Actions</th>
         </tr>
 
@@ -138,11 +190,22 @@ include 'includes/header.php';
                 <td><?php echo htmlspecialchars($voiture['modele']); ?></td>
                 <td>Rs <?php echo number_format($voiture['prix'], 0, ',', ' '); ?></td>
                 <td>
+                    <?php if ($voiture['annee']) { ?><?php echo htmlspecialchars($voiture['annee']); ?><br><?php } ?>
+                    <?php if ($voiture['puissance']) { ?><?php echo htmlspecialchars($voiture['puissance']); ?> ch<br><?php } ?>
+                    <?php echo htmlspecialchars($voiture['carburant'] ?? ''); ?>
+                    <?php if ($voiture['boite']) { ?>&middot; <?php echo htmlspecialchars($voiture['boite']); ?><?php } ?>
+                </td>
+                <td>
                     <a class="btn" href="voitures.php?edit=<?php echo $voiture['id_voiture']; ?>">Modifier</a>
-                    <a class="btn btn-danger" href="voitures.php?delete=<?php echo $voiture['id_voiture']; ?>"
-                       onclick="return confirm('Supprimer cette voiture ?');">
-                        Supprimer
-                    </a>
+
+                    <form method="POST" style="display:inline;">
+                        <?php echo csrf_field(); ?>
+                        <input type="hidden" name="supprimer_voiture" value="<?php echo $voiture['id_voiture']; ?>">
+                        <button class="btn btn-danger" type="submit"
+                                onclick="return confirm('Supprimer cette voiture ?');">
+                            Supprimer
+                        </button>
+                    </form>
                 </td>
             </tr>
         <?php } ?>

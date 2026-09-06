@@ -23,9 +23,18 @@ Le projet a deux parties :
 - mot de passe hash ;
 - id_client.
 
-`voiture` contient les voitures du catalogue.
+`voiture` contient les voitures du catalogue :
+- modele ;
+- prix ;
+- description ;
+- image ;
+- annee ;
+- carburant ;
+- boite ;
+- puissance ;
+- id_marque.
 
-`marque` contient les marques : BMW, Audi, Mercedes.
+`marque` contient les marques : BMW, Audi, Mercedes, Porsche, Ferrari, Jeep, Land Rover.
 
 `voiture_image` contient les images supplementaires de chaque voiture.
 
@@ -46,6 +55,27 @@ Un message peut aussi contenir :
 `services` contient les services affiches sur la page services.
 
 `admin` contient les comptes administrateurs.
+
+## Catalogue
+
+Le catalogue compte 7 marques et 21 voitures (3 par marque).
+Chaque voiture possede 6 images dans la table `voiture_image`, affichees dans
+une galerie avec des fleches sur la page detail. Les images ont ete telechargees
+depuis Wikimedia Commons (licence libre CC) et les caracteristiques (prix,
+annee, carburant, puissance, description) sont fictives.
+
+Marques du catalogue :
+- BMW : M3 Competition, Serie 7, M8 Competition ;
+- Audi : RS6 Avant, RS3 Sportback, RS7 Sportback ;
+- Mercedes : AMG GT, Classe G, C 63 AMG ;
+- Porsche : 911 Turbo S, Cayenne Turbo GT, Taycan Turbo S ;
+- Ferrari : F8 Tributo, Roma, Purosangue ;
+- Jeep : Wrangler Rubicon, Grand Cherokee, Compass ;
+- Land Rover : Range Rover Sport, Defender 110, Evoque.
+
+La page catalogue (voitures.php) permet de filtrer par marque et de rechercher ;
+les resultats sont pagines (6 par page). La page detail (detail.php) affiche le
+carrousel d'images et les specifications completes.
 
 ## Connexion client
 
@@ -68,39 +98,70 @@ La page `register.php` :
 
 ## Demande d'essai
 
-La page `essai.php` :
-1. verifie qu'une voiture est choisie avec `id` dans l'URL ;
-2. verifie que le client est connecte ;
-3. recupere les informations de la voiture ;
-4. recupere les informations du client ;
-5. quand le formulaire est envoye :
-   - met a jour le client avec telephone/adresse ;
-   - ajoute une ligne dans `essai` avec la date et l'heure choisies.
+La page `demande_essai.php` est la page principale pour faire une demande d'essai :
+1. verifie que le client est connecte ;
+2. le client choisit la voiture dans une liste (ou elle est preselectiionnee depuis la fiche voiture) ;
+3. il choisit la date (aujourd'hui ou dans le futur) ;
+4. il choisit une heure entre 08:00 et 18:00 ;
+5. ses informations personnelles (telephone, adresse) sont mises a jour ;
+6. la demande est ajoutee dans la table `essai`.
+
+Les operations 5 et 6 sont faites dans une transaction : si l'une echoue, aucune n'est enregistree.
+
+L'ancienne page `essai.php` a ete remplacee : elle redirige maintenant simplement vers `demande_essai.php` en conservant la voiture choisie dans l'URL. Cela evite de dupliquer le code de la demande d'essai.
 
 La table `essai` ne stocke que la demande. Les informations personnelles restent dans `client`.
 
-La page `demande_essai.php` permet aussi de faire une demande d'essai, mais avec un formulaire plus complet :
-1. le client choisit la voiture dans une liste ;
-2. il choisit la date ;
-3. il choisit une heure entre 08:00 et 18:00 ;
-4. ses informations personnelles sont mises a jour ;
-5. la demande est ajoutee dans `essai`.
+## Mon compte
+
+La page `compte.php` est l'espace client central :
+1. si le visiteur n'est pas connecte, elle le redirige vers `login.php` ;
+2. si le client est connecte, elle affiche son profil (nom, email, telephone, adresse) ;
+3. elle affiche ses demandes d'essai avec leur statut ;
+4. elle permet de modifier son profil (nom, telephone, adresse) via un formulaire.
+
+La page est decoupee en deux onglets (sans rechargement de page) :
+- « Mes reservations » : la liste des demandes d'essai du client ;
+- « Modifier mon profil » : le formulaire de mise a jour des coordonnees.
+
+Les onglets utilisent du JavaScript simple : au clic, on cache tous les panneaux
+puis on affiche celui correspondant (`data-panel` / `id`).
+
+L'ancienne page `reservation.php` redirige vers `compte.php` : les reservations
+sont desormais affichees dans l'espace compte pour eviter la duplication de code.
+
+Dans le menu (header), le bouton « Mon compte » remplace les anciens boutons
+« Connexion » et « S'inscrire ». Quand le client est connecte, il affiche son
+prenom et un bouton de deconnexion.
+
+## Carrousel du hero (accueil)
+
+La page d'accueil affiche un carrousel d'images de fond dans le hero :
+1. les images (`background1.webp`, `background2.png`, `background3.png`, `background4.png`)
+   sont des calques superposes dans `.hero-slider` ;
+2. une seule image est visible a la fois (classe `is-active`) ;
+3. un petit script JavaScript change l'image toutes les 6 secondes, avec des
+   fleches et des points de navigation cliquables ;
+4. un voile sombre (CSS) est place au-dessus des images pour garder le texte lisible.
 
 ## Catalogue voitures
 
 La page `voitures.php` :
-1. recupere les marques ;
-2. pour chaque marque, recupere les voitures associees ;
-3. affiche chaque voiture dans une carte ;
-4. le bouton detail envoie vers `detail.php?id=...`.
+1. permet une recherche par mot-cle (modele, marque, description) ;
+2. permet de filtrer par marque ;
+3. affiche les voitures par groupe de 6 avec une pagination dynamique ;
+4. la pagination utilise `LIMIT` et `OFFSET` dans la requete SQL ;
+5. chaque carte renvoie vers `detail.php?id=...`.
 
 ## Detail voiture
 
 La page `detail.php` :
 1. recupere l'id de la voiture dans l'URL ;
-2. affiche les informations de la voiture ;
-3. affiche les images liees dans `voiture_image` ;
-4. propose un bouton pour reserver un essai.
+2. verifie que la voiture existe (sinon retour au catalogue) ;
+3. affiche les informations de la voiture ;
+4. affiche les caracteristiques techniques (annee, carburant, boite, puissance) stockees en base ;
+5. affiche les images liees dans `voiture_image` avec une galerie cliquable ;
+6. propose un bouton pour reserver un essai.
 
 ## Contact
 
@@ -187,4 +248,12 @@ Les images doivent se trouver dans le dossier `images`.
 
 Les requetes preparees avec `prepare()` et `execute()` servent a eviter les injections SQL.
 
+`session_regenerate_id()` change l'identifiant de session apres la connexion pour eviter la fixation de session.
+
+`htmlspecialchars()` (via la fonction `e()` dans `includes/functions.php`) sert a echapper les donnees affichees pour eviter les failles XSS.
+
+Le jeton CSRF (`csrf_token`, `csrf_field`, `csrf_verify`) est un code secret genere dans la session : il est insere dans chaque formulaire et verifie cote serveur. Cela empeche un tiers d'envoyer un formulaire a la place d'un utilisateur connecte.
+
 `header("Location: ...")` sert a rediriger l'utilisateur vers une autre page.
+
+`LIMIT` et `OFFSET` dans une requete SQL permettent d'afficher les resultats par page (pagination).

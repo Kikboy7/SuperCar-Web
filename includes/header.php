@@ -1,128 +1,93 @@
 <?php
+/**
+ * header.php
+ * Partie haute de chaque page : session, connexion BDD, entete HTML et
+ * barre de navigation responsive.
+ *
+ * Chaque page doit definir $pageTitle avant d'inclure ce fichier.
+ */
+
+// Session : permet de savoir si un client est connecte.
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include 'db.php';
 
+// Connexion a la base + fonctions utilitaires.
+require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/functions.php';
+
+// Titre de la page (par defaut s'il n'est pas defini par la page).
+$pageTitle = $pageTitle ?? 'SuperCar';
+
+// Page actuelle (pour mettre en surbrillance le lien du menu).
+$pageCourante = basename($_SERVER['PHP_SELF']);
+
+// On recupere les infos du client connecte pour la barre de navigation.
 $client = null;
-
 if (isset($_SESSION['client'])) {
     $stmt = $pdo->prepare("SELECT nom, email FROM client WHERE id_client = ?");
     $stmt->execute([$_SESSION['client']]);
     $client = $stmt->fetch();
 }
 ?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo e($pageTitle); ?> | SuperCar</title>
 
-<style>
-/* NAVBAR CUSTOM */
-.custom-navbar {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    <!-- Polices modernes (restent lues en local si internet indisponible) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    background: rgba(0,0,0,0.9) !important;
-    backdrop-filter: blur(10px);
+    <!-- Bootstrap + feuille de style du site -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
 
-    padding: 15px 0;
-}
+<nav class="navbar">
+    <div class="container navbar-inner">
 
-/* CONTENEUR CENTRE */
-.custom-container {
-    max-width: 1200px;
-    margin: auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-}
-
-/* LOGO */
-.logo img {
-    height: 45px;
-}
-
-/* MENU */
-.nav-center {
-    display: flex;
-    gap: 30px;
-}
-
-/* LINKS */
-.nav-center a,
-.nav-right a,
-.nav-right span {
-    color: #ccc !important;
-    text-decoration: none;
-    position: relative;
-    transition: 0.3s;
-}
-
-/* HOVER */
-.nav-center a::after,
-.nav-right a::after {
-    content: "";
-    position: absolute;
-    width: 0%;
-    height: 2px;
-    background: #f39c12;
-    left: 0;
-    bottom: -5px;
-    transition: 0.3s;
-}
-
-.nav-center a:hover::after,
-.nav-right a:hover::after {
-    width: 100%;
-}
-
-.nav-center a:hover,
-.nav-right a:hover {
-    color: white !important;
-}
-
-/* USER */
-.nav-right {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-}
-
-.user {
-    color: #f39c12 !important;
-}
-</style>
-
-
-
-<nav class="custom-navbar">
-
-    <div class="custom-container">
-
-        <!-- LOGO -->
+        <!-- Logo -->
         <a href="index.php" class="logo">
-            <img src="images/logo.png">
+            <img src="images/logo.png" alt="SuperCar">
         </a>
 
-        <!-- MENU -->
-        <div class="nav-center">
-            <a href="index.php">Accueil</a>
-            <a href="voitures.php">Voitures</a>
-	        <a href="demande_essai.php">Demander un essai</a>
-            <a href="reservation.php">Mes reservations</a>
-            <a href="services.php">Services</a>
-            <a href="contact.php">Contact</a>
-        </div>
+        <!-- Bouton menu mobile (hamburger) -->
+        <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu">
+            <span></span>
+        </button>
 
-        <!-- USER -->
-        <div class="nav-right">
-            <?php if ($client) { ?>
-                <span class="user">👤 <?php echo $client['nom']; ?></span>
-	                <a href="logout.php">Logout</a>
-            <?php } else { ?>
-                <a href="login.php">Login</a>
-            <?php } ?>
+        <!-- Partie repliable sur mobile : menu + zone compte -->
+        <div class="nav-collapse" id="navCollapse">
+
+            <!-- Liens de navigation -->
+            <ul class="nav-links">
+                <li><a href="index.php" class="<?php echo $pageCourante == 'index.php' ? 'active' : ''; ?>">Accueil</a></li>
+                <li><a href="voitures.php" class="<?php echo in_array($pageCourante, ['voitures.php', 'detail.php']) ? 'active' : ''; ?>">Voitures</a></li>
+                <li><a href="demande_essai.php" class="<?php echo $pageCourante == 'demande_essai.php' ? 'active' : ''; ?>">Demander un essai</a></li>
+                <li><a href="services.php" class="<?php echo $pageCourante == 'services.php' ? 'active' : ''; ?>">Services</a></li>
+                <li><a href="contact.php" class="<?php echo $pageCourante == 'contact.php' ? 'active' : ''; ?>">Contact</a></li>
+            </ul>
+
+            <!-- Zone compte (a droite sur ecran large) -->
+            <div class="nav-actions">
+                <?php if ($client) { ?>
+                    <a href="compte.php" class="nav-user">
+                        &#128100; <?php echo e($client['nom']); ?>
+                    </a>
+                    <a href="logout.php" class="btn btn-outline btn-sm">D&eacute;connexion</a>
+                <?php } else { ?>
+                    <a href="compte.php" class="btn btn-main btn-sm">Mon compte</a>
+                <?php } ?>
+            </div>
+
         </div>
 
     </div>
-
 </nav>
+
+<main>

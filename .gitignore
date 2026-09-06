@@ -24,3 +24,6 @@ node_modules/
 # Exports locaux
 exports/
 backups/
+
+# Artefacts locaux de rendu de la documentation
+docx_render_check/

@@ -1,206 +1,97 @@
 <?php
+/**
+ * presentation.php - Page de presentation de la reservation d'essai.
+ * Explique pourquoi faire un essai chez SuperCar et comment ca marche.
+ */
+$pageTitle = "R&eacute;server un essai";
 include 'includes/header.php';
 
 $isLogged = isset($_SESSION['client']);
 ?>
-<!DOCTYPE html>
-<html lang="fr">
 
-<head>
-    <meta charset="UTF-8">
-    <title>Réserver un essai</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #111;
-            color: white;
-        }
+<section class="hero">
+    <div class="container">
+        <div class="hero-content fade-up">
+            <span class="hero-tag">R&eacute;server un essai</span>
+            <h1>Vivez une <span>exp&eacute;rience</span> de conduite unique</h1>
+            <p>D&eacute;couvrez nos v&eacute;hicules dans des conditions r&eacute;elles de conduite&nbsp;: performance, confort, pr&eacute;cision.</p>
+            <div class="hero-actions">
+                <?php if ($isLogged) { ?>
+                    <a href="demande_essai.php" class="btn btn-main">Demander un essai</a>
+                <?php } else { ?>
+                    <a href="login.php" class="btn btn-main">Se connecter</a>
+                    <a href="register.php" class="btn btn-outline">Cr&eacute;er un compte</a>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+</section>
 
-        
-         .hero {
-            height: 100vh;
-            background: url('images/background2.png') center/cover no-repeat;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
-        }
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <span class="section-tag">Pourquoi un essai&nbsp;?</span>
+            <h2 class="section-title">Bien plus qu'un simple test</h2>
+            <p class="section-sub">
+                R&eacute;server un essai chez SuperCar, c'est une v&eacute;ritable immersion dans
+                l'univers de la performance, du luxe et de l'innovation automobile.
+            </p>
+        </div>
 
-         .hero::after {
-            content: "";
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-        }
+        <div class="car-grid">
+            <div class="service-card">
+                <div class="service-num">&#128293;</div>
+                <h3>Performance r&eacute;elle</h3>
+                <p>Acc&eacute;l&eacute;ration, tenue de route, pr&eacute;cision : ressentez chaque d&eacute;tail de conduite.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-num">&#128100;</div>
+                <h3>Accompagnement expert</h3>
+                <p>Nos conseillers r&eacute;pondent &agrave; vos questions et vous guident vers le bon mod&egrave;le.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-num">&#9989;</div>
+                <h3>Un choix &eacute;clair&eacute;</h3>
+                <p>L'essai est une &eacute;tape essentielle pour choisir votre future voiture en toute confiance.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-         .hero-content {
-            position: relative;
-            z-index: 1;
-        }
+<section class="section" style="background: var(--noir-2); border-top: 1px solid var(--bordure); border-bottom: 1px solid var(--bordure);">
+    <div class="container">
+        <div class="section-head">
+            <span class="section-tag">Comment &ccedil;a marche&nbsp;?</span>
+            <h2 class="section-title">Trois &eacute;tapes simples</h2>
+        </div>
 
-         .hero h1 {
-            font-size: 50px;
-            margin-bottom: 10px;
-        }
+        <div class="steps">
+            <div class="step-card">
+                <div class="num">1</div>
+                <h3><?php echo $isLogged ? 'Acc&eacute;der au catalogue' : 'Cr&eacute;er un compte'; ?></h3>
+                <p><?php echo $isLogged ? 'Connectez-vous pour r&eacute;server rapidement.' : 'Inscrivez-vous en quelques secondes.'; ?></p>
+            </div>
+            <div class="step-card">
+                <div class="num">2</div>
+                <h3>Choisir une voiture</h3>
+                <p>Parcourez notre catalogue et s&eacute;lectionnez le mod&egrave;le qui vous pla&icirc;t.</p>
+            </div>
+            <div class="step-card">
+                <div class="num">3</div>
+                <h3>R&eacute;server un essai</h3>
+                <p>Choisissez une date, un horaire, et c'est parti&nbsp;!</p>
+            </div>
+        </div>
 
-         .hero p {
-            font-size: 20px;
-            margin-bottom: 30px;
-        }
-
-        
-         .btn {
-            padding: 15px 30px;
-            background: white;
-            color: black;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 5px;
-            transition: 0.3s;
-        }
-
-         .btn:hover {
-            background: #ccc;
-        }
-
-        
-         .section {
-            padding: 80px 20px;
-            text-align: center;
-            background-image: url("images/background3.png");
-            background-size: cover;
-            background-position: center;
-        }
-
-         .section h2 {
-            font-size: 35px;
-            margin-bottom: 20px;
-        }
-
-         .section p {
-            max-width: 700px;
-            margin: auto;
-            color: #ffffff;
-        }
-
-        
-
-         .steps {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 40px;
-        }
-
-         .step {
-            background: #4b4b4b;
-            padding: 30px;
-            border-radius: 10px;
-            width: 220px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-         .step:hover {
-            transform: scale(1.08);
-            background: #6b6262;
-            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.5);
-        }
-
-        
-         .step a {
-            text-decoration: none;
-            color: white;
-            display: block;
-        }
-
-         .step h3 {
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-</style>
-
-</head>
-
-<body>
-
-    <div class="hero">
-        <div class="hero-content">
-            <h1>Réservez votre essai</h1>
-            <p>Vivez une expérience de conduite unique</p>
+        <div class="text-center mt-4">
             <?php if ($isLogged) { ?>
-	                <a href="demande_essai.php" class="btn">Demander un essai</a>
+                <a href="demande_essai.php" class="btn btn-main">Demander un essai</a>
             <?php } else { ?>
-                <a href="login.php" class="btn">Se connecter</a>
+                <a href="register.php" class="btn btn-main">Cr&eacute;er un compte</a>
+                <a href="login.php" class="btn btn-outline">Se connecter</a>
             <?php } ?>
         </div>
     </div>
-
-    <div class="section">
-        <h2>Pourquoi réserver un essai ?</h2>
-        <br><br>
-        <p>
-            Réserver un essai chez SuperCar, c'est bien plus qu'un simple test de véhicule.
-            C'est une véritable immersion dans l'univers de la performance, du luxe et de l'innovation automobile.
-            <br><br>
-            Lors de votre essai, vous avez l'opportunité de découvrir nos véhicules dans des conditions réelles de
-            conduite,
-            afin de ressentir pleinement leur puissance, leur confort et leur précision.
-            <br><br>
-            Chaque détail compte : l'accélération, la tenue de route, le silence à bord ou encore les technologies
-            embarquées.
-            <br><br>
-            Nos experts sont également à votre disposition pour vous accompagner tout au long de l'expérience.
-            Ils vous conseillent, répondent à vos questions et vous aident à trouver le véhicule parfaitement adapté à
-            vos besoins.
-            <br><br>
-            Que vous soyez passionné d'automobile ou à la recherche de votre future voiture,
-            l'essai est une étape essentielle pour faire un choix éclairé en toute confiance.
-            <br><br>
-            Avec SuperCar, vous ne choisissez pas seulement une voiture...
-            vous vivez une expérience.
-        </p>
-
-        <br><br><br><br>
-
-        <h2>Comment ça marche ?</h2>
-
-        <br>
-
-        <div class="steps">
-
-            <div class="step">
-	                <a href="<?php echo $isLogged ? 'demande_essai.php' : 'login.php'; ?>">
-                    <h3>1</h3>
-                    <p><?php echo $isLogged ? 'Accéder au catalogue' : 'Créer un compte'; ?></p>
-                </a>
-            </div>
-
-            <div class="step">
-                <a href="voitures.php">
-                    <h3>2</h3>
-                    <p>Choisir une voiture</p>
-                </a>
-            </div>
-
-            <div class="step">
-                <a href="voitures.php">
-                    <h3>3</h3>
-                    <p>Réserver un essai</p>
-                </a>
-            </div>
-
-        </div>
-
-    </div>
+</section>
 
 <?php include 'includes/footer.php'; ?>
-
-</body>
-
-</html>

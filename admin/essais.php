@@ -6,13 +6,17 @@ $message = "";
 
 // Changement de statut d'une demande.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $id_essai = $_POST['id_essai'];
-    $statut = $_POST['statut'];
+    if (!csrf_verify()) {
+        $message = "Session de securite invalide.";
+    } else {
+        $id_essai = $_POST['id_essai'];
+        $statut = $_POST['statut'];
 
-    $stmt = $pdo->prepare("UPDATE essai SET statut = ? WHERE id_essai = ?");
-    $stmt->execute([$statut, $id_essai]);
+        $stmt = $pdo->prepare("UPDATE essai SET statut = ? WHERE id_essai = ?");
+        $stmt->execute([$statut, $id_essai]);
 
-    $message = "Statut mis a jour.";
+        $message = "Statut mis a jour.";
+    }
 }
 
 // On recupere les demandes avec les informations du client et de la voiture.
@@ -58,6 +62,7 @@ include 'includes/header.php';
                 <td class="status"><?php echo htmlspecialchars($essai['statut']); ?></td>
                 <td>
                     <form method="POST">
+                        <?php echo csrf_field(); ?>
                         <input type="hidden" name="id_essai" value="<?php echo $essai['id_essai']; ?>">
                         <select name="statut">
                             <option value="en attente" <?php if ($essai['statut'] == 'en attente') echo 'selected'; ?>>en attente</option>

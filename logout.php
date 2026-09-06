@@ -1,8 +1,13 @@
 <?php
-session_start();
+/**
+ * logout.php - Deconnexion du client.
+ * Supprime uniquement les informations de session du client connecte.
+ */
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-session_unset();
-session_destroy();
+unset($_SESSION['client']);
 
 header("Location: index.php");
 exit();

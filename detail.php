@@ -1,288 +1,156 @@
 <?php
+/**
+ * detail.php - Fiche detaillee d'une voiture.
+ * Affiche la galerie d'images (voiture_image), les informations et les
+ * caracteristiques techniques de la voiture choisie.
+ */
 include 'includes/header.php';
-include 'includes/db.php';
 
-if (!isset($_GET['id'])) {
-    die("Voiture non trouvée");
+// Il faut obligatoirement un id de voiture valide dans l'URL.
+if (!isset($_GET['id']) || !ctype_digit($_GET['id'])) {
+    header("Location: voitures.php");
+    exit();
 }
 
-$id = $_GET['id'];
+$id = (int) $_GET['id'];
 
+// Informations de la voiture + nom de sa marque.
 $stmt = $pdo->prepare("
-    SELECT voiture.*, marque.nom_marque 
+    SELECT voiture.*, marque.nom_marque
     FROM voiture
     JOIN marque ON voiture.id_marque = marque.id_marque
-    WHERE id_voiture = ?
+    WHERE voiture.id_voiture = ?
 ");
 $stmt->execute([$id]);
 $car = $stmt->fetch();
 
+// Si la voiture n'existe pas, on revient au catalogue.
 if (!$car) {
-    die("Voiture non trouvée");
+    header("Location: voitures.php");
+    exit();
 }
 
-$stmt = $pdo->prepare("SELECT * FROM voiture_image WHERE id_voiture = ?");
+$pageTitle = $car['nom_marque'] . ' ' . $car['modele'];
+
+// Les images supplementaires de la voiture.
+$stmt = $pdo->prepare("SELECT url FROM voiture_image WHERE id_voiture = ? ORDER BY id_image");
 $stmt->execute([$id]);
 $images = $stmt->fetchAll();
+
+// D'autres modeles de la meme marque (sans la voiture actuelle).
+$stmt = $pdo->prepare("
+    SELECT id_voiture, modele, image, prix
+    FROM voiture
+    WHERE id_marque = ? AND id_voiture != ?
+    LIMIT 3
+");
+$stmt->execute([$car['id_marque'], $id]);
+$modeles_proches = $stmt->fetchAll();
 ?>
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<title><?php echo $car['nom_marque'] . " " . $car['modele']; ?></title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-body {
-    background: #0f0f0f;
-    color: white;
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
-}
+<section class="detail-page">
+    <div class="container">
 
+        <a href="voitures.php" class="btn btn-ghost btn-sm mb-2">&larr; Retour au catalogue</a>
 
- .detail-container {
-    max-width: 1300px;
-    margin: 60px auto;
-    padding: 20px;
-}
+        <div class="detail-grid">
 
+            <!-- ============ GALERIE ============ -->
+            <div class="fade-up">
+                <div class="gallery-main">
+                    <img src="images/<?php echo e($images[0]['url'] ?? $car['image']); ?>" alt="<?php echo e($car['nom_marque'] . ' ' . $car['modele']); ?>" id="mainImg">
+                </div>
 
- .detail-grid {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 50px;
-}
-
-
- .main-img {
-    width: 100%;
-    height: 500px;
-    object-fit: cover;
-    border-radius: 15px;
-    transition: 0.4s;
-}
-
- .thumbnails {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-
- .thumb {
-    width: 90px;
-    height: 70px;
-    object-fit: cover;
-    border-radius: 8px;
-    cursor: pointer;
-    opacity: 0.6;
-    transition: 0.3s;
-}
-
- .thumb:hover {
-    opacity: 1;
-}
-
-
- .title {
-    font-size: 40px;
-    font-weight: bold;
-}
-
- .price {
-    font-size: 28px;
-    color: #f39c12;
-    margin: 15px 0;
-}
-
- .desc {
-    color: #bbb;
-    margin-bottom: 25px;
-    line-height: 1.6;
-}
-
-
- .specs {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    margin-bottom: 30px;
-}
-
- .spec {
-    background: #1c1c1c;
-    padding: 15px;
-    border-radius: 10px;
-}
-
- .spec span {
-    display: block;
-    color: #888;
-    font-size: 14px;
-}
-
- .spec strong {
-    font-size: 16px;
-}
-
-
- .actions {
-    display: flex;
-    gap: 15px;
-}
-
- .btn-main {
-    background: #f39c12;
-    padding: 12px 25px;
-    border-radius: 30px;
-    color: black;
-    text-decoration: none;
-    font-weight: bold;
-    transition: 0.3s;
-}
-
- .btn-main:hover {
-    background: white;
-}
-
- .btn-secondary {
-    border: 1px solid #555;
-    padding: 12px 25px;
-    border-radius: 30px;
-    color: white;
-    text-decoration: none;
-}
-
- .btn-secondary:hover {
-    background: #222;
-}
-
-
- .extra {
-    margin-top: 60px;
-}
-
- .extra h3 {
-    margin-bottom: 20px;
-}
-
- .features {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
- .feature {
-    background: #1c1c1c;
-    padding: 15px 20px;
-    border-radius: 10px;
-}
-
-
-@media(max-width: 900px) {
-.detail-grid {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
-
-</head>
-
-<body>
-
-<section class="detail-container">
-
-<div class="detail-grid">
-
-    <!-- IMAGES -->
-    <div>
-        <img src="images/<?php echo $images[0]['url'] ?? $car['image']; ?>" class="main-img">
-
-        <div class="thumbnails">
-            <?php foreach ($images as $img) { ?>
-                <img src="images/<?php echo $img['url']; ?>" class="thumb">
-            <?php } ?>
-        </div>
-    </div>
-
-    <!-- INFOS -->
-    <div>
-
-        <h1 class="title">
-            <?php echo $car['nom_marque'] . " " . $car['modele']; ?>
-        </h1>
-
-        <p class="price">
-            Rs <?php echo number_format($car['prix'], 0, ',', ' '); ?>
-        </p>
-
-        <p class="desc">
-            <?php echo $car['description'] ?? "Une voiture haut de gamme combinant performance, confort et design exceptionnel. Idéale pour les passionnés d’automobile à la recherche d’une expérience unique."; ?>
-        </p>
-
-        <!-- SPECS -->
-        <div class="specs">
-
-            <div class="spec">
-                <span>Puissance</span>
-                <strong><?php echo $car['puissance'] ?? '450'; ?> ch</strong>
+                <?php if (count($images) > 0) { ?>
+                    <div class="gallery-thumbs">
+                        <?php foreach ($images as $index => $img) { ?>
+                            <img src="images/<?php echo e($img['url']); ?>"
+                                 alt="Image <?php echo $index + 1; ?>"
+                                 class="<?php echo $index === 0 ? 'active' : ''; ?>"
+                                 data-src="images/<?php echo e($img['url']); ?>">
+                        <?php } ?>
+                    </div>
+                <?php } ?>
             </div>
 
-            <div class="spec">
-                <span>Carburant</span>
-                <strong><?php echo $car['carburant'] ?? 'Essence'; ?></strong>
-            </div>
+            <!-- ============ INFORMATIONS ============ -->
+            <div class="fade-up delay-1">
+                <div class="detail-brand"><?php echo e($car['nom_marque']); ?></div>
+                <h1 class="detail-title"><?php echo e($car['modele']); ?></h1>
 
-            <div class="spec">
-                <span>Boîte</span>
-                <strong><?php echo $car['boite'] ?? 'Automatique'; ?></strong>
-            </div>
+                <div class="detail-price">Rs <?php echo number_format($car['prix'], 0, ',', ' '); ?></div>
 
-            <div class="spec">
-                <span>Année</span>
-                <strong><?php echo $car['annee'] ?? '2023'; ?></strong>
+                <p class="detail-desc">
+                    <?php echo e($car['description'] ?? 'Une voiture haut de gamme combinant performance, confort et design exceptionnel.'); ?>
+                </p>
+
+                <div class="specs-grid">
+                    <div class="spec-box">
+                        <span>Puissance</span>
+                        <strong><?php echo (int) ($car['puissance'] ?? 0); ?> ch</strong>
+                    </div>
+                    <div class="spec-box">
+                        <span>Carburant</span>
+                        <strong><?php echo e($car['carburant'] ?? 'Non renseign&eacute;'); ?></strong>
+                    </div>
+                    <div class="spec-box">
+                        <span>Bo&icirc;te de vitesses</span>
+                        <strong><?php echo e($car['boite'] ?? 'Non renseign&eacute;'); ?></strong>
+                    </div>
+                    <div class="spec-box">
+                        <span>Ann&eacute;e</span>
+                        <strong><?php echo (int) ($car['annee'] ?? 0); ?></strong>
+                    </div>
+                </div>
+
+                <div class="detail-actions">
+                    <a href="demande_essai.php?id=<?php echo $car['id_voiture']; ?>" class="btn btn-main">R&eacute;server un essai</a>
+                    <a href="contact.php" class="btn btn-outline">Poser une question</a>
+                </div>
             </div>
 
         </div>
 
-        <!-- ACTIONS -->
-        <div class="actions">
-	            <a href="demande_essai.php?id=<?php echo $car['id_voiture']; ?>" class="btn-main">
-                Réserver un essai
-            </a>
+        <!-- ============ AUTRES MODELES ============ -->
+        <?php if (count($modeles_proches) > 0) { ?>
+            <div class="mt-4">
+                <div class="section-head">
+                    <span class="section-tag"><?php echo e($car['nom_marque']); ?></span>
+                    <h2 class="section-title">Autres mod&egrave;les de la m&ecirc;me marque</h2>
+                </div>
 
-            <a href="voitures.php" class="btn-secondary">
-                Retour
-            </a>
-        </div>
+                <div class="car-grid">
+                    <?php foreach ($modeles_proches as $autre) { ?>
+                        <article class="car-card">
+                            <a href="detail.php?id=<?php echo $autre['id_voiture']; ?>" class="thumb">
+                                <img src="images/<?php echo e($autre['image']); ?>" alt="<?php echo e($autre['modele']); ?>" loading="lazy">
+                            </a>
+                            <div class="body">
+                                <h3><?php echo e($car['nom_marque'] . ' ' . $autre['modele']); ?></h3>
+                                <span class="price">Rs <?php echo number_format($autre['prix'], 0, ',', ' '); ?></span>
+                                <div class="actions">
+                                    <a href="detail.php?id=<?php echo $autre['id_voiture']; ?>" class="btn btn-outline btn-sm">Voir</a>
+                                </div>
+                            </div>
+                        </article>
+                    <?php } ?>
+                </div>
+            </div>
+        <?php } ?>
 
     </div>
-
-</div>
-
-<!-- SECTION BONUS -->
-<div class="extra">
-
-    <h3>Équipements & Options</h3>
-
-    <div class="features">
-        <div class="feature">GPS intégré</div>
-        <div class="feature">Sièges chauffants</div>
-        <div class="feature">Caméra 360°</div>
-        <div class="feature">Mode sport</div>
-    </div>
-
-</div>
-
 </section>
 
 <script>
-document.querySelectorAll('.thumb').forEach(img => {
-    img.addEventListener('click', function () {
-        const main = document.querySelector('.main-img');
+// Galerie : cliquer sur une miniature remplace l'image principale.
+document.querySelectorAll('.gallery-thumbs img').forEach(function (thumb) {
+    thumb.addEventListener('click', function () {
+        document.querySelectorAll('.gallery-thumbs img').forEach(function (t) { t.classList.remove('active'); });
+        thumb.classList.add('active');
+        var main = document.getElementById('mainImg');
         main.style.opacity = 0;
-        setTimeout(() => {
-            main.src = this.src;
+        setTimeout(function () {
+            main.src = thumb.dataset.src;
             main.style.opacity = 1;
         }, 150);
     });
@@ -290,6 +158,3 @@ document.querySelectorAll('.thumb').forEach(img => {
 </script>
 
 <?php include 'includes/footer.php'; ?>
-
-</body>
-</html>
