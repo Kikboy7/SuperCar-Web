@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id_client = $client ? $_SESSION['client'] : null;
 
     if (!csrf_verify()) {
-        $error = "Session de securite invalide, veuillez reessayer.";
+        $error = "Session de sécurité invalide, veuillez réessayer.";
     } elseif ($nom === '' || $email === '' || $contenu === '') {
         $error = "Veuillez remplir tous les champs.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ");
         $stmt->execute([$nom, $email, $contenu, $id_client]);
 
-        $success = "Votre message a bien &eacute;t&eacute; envoy&eacute;. Notre &eacute;quipe vous r&eacute;pondra rapidement.";
+        $success = "Votre message a bien été envoyé. Notre équipe vous répondra rapidement.";
         $saisie = ['nom' => '', 'email' => ''];
     }
 }
@@ -97,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <span class="icon">&#9203;</span>
                 <div>
                     <h3>Horaires</h3>
-                    <p>Lun - Ven : 09h00 - 17h00 &nbsp; | &nbsp; Sam : 09h00 - 13h00</p>
+                    <p>Lun - Ven : 08h00 - 18h00 &nbsp; | &nbsp; Sam : 09h00 - 13h00</p>
                 </div>
             </div>
 

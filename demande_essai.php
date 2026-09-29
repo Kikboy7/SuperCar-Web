@@ -62,11 +62,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $heure    = $_POST['heure'] ?? '';
 
     if (!csrf_verify()) {
-        $error = "Session de securite invalide, veuillez reessayer.";
-    } elseif ($nom === '' || $email === '' || $adresse === '' || $date === '' || $heure === '' || $id_voiture_post <= 0) {
+        $error = "Session de sécurité invalide, veuillez réessayer.";
+    } elseif ($nom === '' || $email === '' || $telephone === '' || $adresse === '' || $date === '' || $heure === '' || $id_voiture_post <= 0) {
         $error = "Veuillez remplir tous les champs obligatoires.";
     } elseif ($date < $date_min) {
-        $error = "La date de l'essai doit etre aujourd'hui ou dans le futur.";
+        $error = "La date de l'essai doit être aujourd'hui ou dans le futur.";
     } elseif (!in_array($heure, $heures_disponibles)) {
         $error = "Veuillez choisir une heure valide entre 08:00 et 18:00.";
     } else {
@@ -74,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt = $pdo->prepare("SELECT id_voiture FROM voiture WHERE id_voiture = ?");
         $stmt->execute([$id_voiture_post]);
         if (!$stmt->fetch()) {
-            $error = "La voiture selectionnee n'existe pas.";
+            $error = "La voiture sélectionnée n'existe pas.";
         } else {
             try {
                 $pdo->beginTransaction();
@@ -97,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $pdo->commit();
 
                 $success = true;
-                $message = "Votre demande d'essai a bien ete envoyee.";
+                $message = "Votre demande d'essai a bien été envoyée.";
                 $id_voiture_prenue = $id_voiture_post;
                 $client_infos = ['nom' => $nom, 'email' => $email, 'telephone' => $telephone, 'adresse' => $adresse];
             } catch (Exception $e) {
@@ -154,7 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 <input type="text" name="nom" placeholder="Nom complet" value="<?php echo e($client_infos['nom'] ?? ''); ?>" required>
                 <input type="email" name="email" placeholder="Adresse e-mail" value="<?php echo e($client_infos['email'] ?? ''); ?>" required>
-                <input type="text" name="telephone" placeholder="T&eacute;l&eacute;phone" value="<?php echo e($client_infos['telephone'] ?? ''); ?>">
+                <input type="text" name="telephone" placeholder="T&eacute;l&eacute;phone" value="<?php echo e($client_infos['telephone'] ?? ''); ?>" required>
                 <input type="text" name="adresse" placeholder="Adresse" value="<?php echo e($client_infos['adresse'] ?? ''); ?>" required>
 
                 <button type="submit" class="btn btn-main btn-block">Envoyer la demande</button>

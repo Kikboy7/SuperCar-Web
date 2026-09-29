@@ -33,6 +33,9 @@ $marques = $stmt->fetchAll();
 
 // Les 3 premiers services proposes.
 $services = $pdo->query("SELECT * FROM services ORDER BY id_services LIMIT 3")->fetchAll();
+
+// Textes modifiables depuis la partie administration.
+$contenuAccueil = $pdo->query("SELECT * FROM contenu_accueil WHERE id_contenu = 1")->fetch();
 ?>
 
 <!-- ============ HERO + CARROUSEL ============ -->
@@ -40,32 +43,19 @@ $services = $pdo->query("SELECT * FROM services ORDER BY id_services LIMIT 3")->
 
     <!-- Carrousel d'images de fond -->
     <div class="hero-slider">
-        <img src="images/background1.webp" alt="" class="hero-slide is-active" data-slide="0">
-        <img src="images/background2.png" alt="" class="hero-slide" data-slide="1">
-        <img src="images/background3.png" alt="" class="hero-slide" data-slide="2">
-        <img src="images/background4.png" alt="" class="hero-slide" data-slide="3">
-    </div>
-
-    <!-- Fleches de navigation -->
-    <button class="hero-slider-btn hero-slider-prev" type="button" aria-label="Image suivante">&lsaquo;</button>
-    <button class="hero-slider-btn hero-slider-next" type="button" aria-label="Image suivante">&rsaquo;</button>
-
-    <!-- Points de navigation -->
-    <div class="hero-slider-dots">
-        <button type="button" class="is-active" data-dot="0" aria-label="Image 1"></button>
-        <button type="button" data-dot="1" aria-label="Image 2"></button>
-        <button type="button" data-dot="2" aria-label="Image 3"></button>
-        <button type="button" data-dot="3" aria-label="Image 4"></button>
+        <img src="images/hero-mercedes.webp" alt="" class="hero-slide hero-slide-mercedes is-active" data-slide="0" fetchpriority="high">
+        <img src="images/hero-audi.webp?v=3" alt="" class="hero-slide hero-slide-audi" data-slide="1">
+        <img src="images/hero-bmw.webp?v=3" alt="" class="hero-slide hero-slide-bmw" data-slide="2">
+        <img src="images/hero-porsche.webp?v=3" alt="" class="hero-slide hero-slide-porsche" data-slide="3">
+        <img src="images/hero-ferrari.webp?v=2" alt="" class="hero-slide hero-slide-ferrari" data-slide="4">
+        <img src="images/hero-landrover.webp?v=2" alt="" class="hero-slide hero-slide-landrover" data-slide="5">
     </div>
 
     <div class="container">
         <div class="hero-content fade-up">
-            <span class="hero-tag">Concessionnaire premium &mdash; depuis 2009</span>
-            <h1>D&eacute;couvrez votre<br><span>prochaine voiture.</span></h1>
-            <p>
-                Performance, luxe et innovation. SuperCar s&eacute;lectionne des v&eacute;hicules
-                d'exception et vous accompagne du premier essai &agrave; la livraison.
-            </p>
+            <span class="hero-tag"><?php echo e($contenuAccueil['hero_surtitre']); ?></span>
+            <h1><?php echo e($contenuAccueil['hero_titre_ligne1']); ?><br><span><?php echo e($contenuAccueil['hero_titre_ligne2']); ?></span></h1>
+            <p><?php echo e($contenuAccueil['hero_description']); ?></p>
 
             <div class="hero-actions">
                 <a href="voitures.php" class="btn btn-main">Voir le catalogue</a>
@@ -79,7 +69,7 @@ $services = $pdo->query("SELECT * FROM services ORDER BY id_services LIMIT 3")->
                 </div>
                 <div class="stat">
                     <strong><?php echo (int) $totalMarques; ?></strong>
-                    <span>Marques internation</span>
+                    <span>Marques internationales</span>
                 </div>
                 <div class="stat">
                     <strong>2009</strong>
@@ -183,8 +173,8 @@ $services = $pdo->query("SELECT * FROM services ORDER BY id_services LIMIT 3")->
 <!-- ============ BANDEAU CTA ============ -->
 <section class="cta-banner">
     <div class="container">
-        <h2>Envieux de tester une voiture ?</h2>
-        <p>R&eacute;servez votre essai en quelques clics et vivez une exp&eacute;rience de conduite unique.</p>
+        <h2><?php echo e($contenuAccueil['cta_titre']); ?></h2>
+        <p><?php echo e($contenuAccueil['cta_description']); ?></p>
         <div class="cta-actions">
             <a href="presentation.php" class="btn btn-main">D&eacute;couvrir l'essai</a>
             <a href="contact.php" class="btn btn-outline">Nous contacter</a>
@@ -196,42 +186,15 @@ $services = $pdo->query("SELECT * FROM services ORDER BY id_services LIMIT 3")->
 // Carrousel du hero : affiche une image de fond a la fois.
 (function () {
     var slides = document.querySelectorAll('.hero-slide');
-    var dots = document.querySelectorAll('.hero-slider-dots button');
     var current = 0;
-    var timer = null;
 
-    function showSlide(index) {
-        if (!slides.length) return;
-        current = (index + slides.length) % slides.length;
-        for (var i = 0; i < slides.length; i++) {
-            slides[i].classList.toggle('is-active', i === current);
-            dots[i].classList.toggle('is-active', i === current);
-        }
+    if (slides.length > 1) {
+        setInterval(function () {
+            slides[current].classList.remove('is-active');
+            current = (current + 1) % slides.length;
+            slides[current].classList.add('is-active');
+        }, 6000);
     }
-
-    function next() { showSlide(current + 1); }
-    function prev() { showSlide(current - 1); }
-
-    function restart() {
-        clearInterval(timer);
-        timer = setInterval(next, 6000);
-    }
-
-    // Fleches
-    var btnNext = document.querySelector('.hero-slider-next');
-    var btnPrev = document.querySelector('.hero-slider-prev');
-    if (btnNext) btnNext.addEventListener('click', function () { next(); restart(); });
-    if (btnPrev) btnPrev.addEventListener('click', function () { prev(); restart(); });
-
-    // Points
-    for (var i = 0; i < dots.length; i++) {
-        (function (index) {
-            dots[index].addEventListener('click', function () { showSlide(index); restart(); });
-        })(i);
-    }
-
-    // Lancement automatique
-    restart();
 })();
 </script>
 

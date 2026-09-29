@@ -46,11 +46,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['supprimer_voiture'])) 
         $message = "<div class=\"alert alert--danger\"><div class=\"alert__content\"><p class=\"alert__text\">Session de sécurité invalide.</p></div></div>";
     } else {
         $id_voiture = (int) $_POST['supprimer_voiture'];
-        $stmt = $pdo->prepare("DELETE FROM voiture_image WHERE id_voiture = ?");
-        $stmt->execute([$id_voiture]);
-        $stmt = $pdo->prepare("DELETE FROM voiture WHERE id_voiture = ?");
-        $stmt->execute([$id_voiture]);
-        $message = "<div class=\"alert alert--success\"><div class=\"alert__content\"><p class=\"alert__text\">Voiture supprimée.</p></div></div>";
+        try {
+            $pdo->beginTransaction();
+
+            // On supprime d'abord les images liées puis la voiture.
+            $stmt = $pdo->prepare("DELETE FROM voiture_image WHERE id_voiture = ?");
+            $stmt->execute([$id_voiture]);
+
+            $stmt = $pdo->prepare("DELETE FROM voiture WHERE id_voiture = ?");
+            $stmt->execute([$id_voiture]);
+
+            $pdo->commit();
+            $message = "<div class=\"alert alert--success\"><div class=\"alert__content\"><p class=\"alert__text\">Voiture supprimée.</p></div></div>";
+        } catch (PDOException $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            $message = "<div class=\"alert alert--danger\"><div class=\"alert__content\"><p class=\"alert__text\">Impossible de supprimer cette voiture car elle est liée à un essai.</p></div></div>";
+        }
     }
 }
 
@@ -130,7 +143,7 @@ include 'includes/header.php';
             <div class="select-wrapper">
                 <select id="carburant" name="carburant" class="form-select">
                     <option value="">-- Choisir --</option>
-                    <?php foreach (['Essence', 'Diesel', 'Hybride', 'Electrique'] as $c) { ?>
+                    <?php foreach (['Essence', 'Diesel', 'Hybride', 'Électrique'] as $c) { ?>
                         <option value="<?php echo $c; ?>" <?php if (($voitureEdit['carburant'] ?? '') == $c) echo 'selected'; ?>>
                             <?php echo $c; ?>
                         </option>

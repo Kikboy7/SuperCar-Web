@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // On récupère les demandes avec les informations du client et de la voiture
 $stmt = $pdo->query("
-    SELECT e.*, c.nom, c.email, c.telephone, v.modele, m.nom_marque
+    SELECT e.*, c.nom, c.email, c.telephone, c.adresse, v.modele, m.nom_marque
     FROM essai e
     JOIN client c ON e.id_client = c.id_client
     JOIN voiture v ON e.id_voiture = v.id_voiture
@@ -98,7 +98,7 @@ include 'includes/header.php';
                     <th>Client</th>
                     <th>Contact</th>
                     <th>Voiture</th>
-                    <th>Date essai</th>
+                    <th>Date de l'essai</th>
                     <th>Heure</th>
                     <th>Statut</th>
                     <th>Action</th>
@@ -111,7 +111,8 @@ include 'includes/header.php';
                             <td><strong><?php echo htmlspecialchars($essai['nom']); ?></strong></td>
                             <td>
                                 <?php echo htmlspecialchars($essai['email']); ?><br>
-                                <span class="text-muted"><?php echo htmlspecialchars($essai['telephone']); ?></span>
+                                <span class="text-muted">Tél. : <?php echo htmlspecialchars($essai['telephone'] ?: 'Non renseigné'); ?></span><br>
+                                <span class="text-muted">Adresse : <?php echo htmlspecialchars($essai['adresse'] ?: 'Non renseignée'); ?></span>
                             </td>
                             <td><?php echo htmlspecialchars($essai['nom_marque'] . " " . $essai['modele']); ?></td>
                             <td><?php echo htmlspecialchars($essai['date_essai']); ?></td>
@@ -124,7 +125,11 @@ include 'includes/header.php';
                                     default => 'badge--warning'
                                 };
                                 ?>
-                                <span class="badge <?php echo $badgeClass; ?>"><?php echo htmlspecialchars($essai['statut']); ?></span>
+                                <span class="badge <?php echo $badgeClass; ?>"><?php echo htmlspecialchars([
+                                    'en attente' => 'En attente',
+                                    'valide' => 'Validée',
+                                    'refuse' => 'Refusée'
+                                ][$essai['statut']] ?? $essai['statut']); ?></span>
                             </td>
                             <td>
                                 <form method="POST" class="table-actions">

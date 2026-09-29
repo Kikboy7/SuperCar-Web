@@ -3,7 +3,7 @@
  * presentation.php - Page de presentation de la reservation d'essai.
  * Explique pourquoi faire un essai chez SuperCar et comment ca marche.
  */
-$pageTitle = "R&eacute;server un essai";
+$pageTitle = "Réserver un essai";
 include 'includes/header.php';
 
 $isLogged = isset($_SESSION['client']);
@@ -69,7 +69,7 @@ $isLogged = isset($_SESSION['client']);
             <div class="step-card">
                 <div class="num">1</div>
                 <h3><?php echo $isLogged ? 'Acc&eacute;der au catalogue' : 'Cr&eacute;er un compte'; ?></h3>
-                <p><?php echo $isLogged ? 'Connectez-vous pour r&eacute;server rapidement.' : 'Inscrivez-vous en quelques secondes.'; ?></p>
+                <p><?php echo $isLogged ? 'Choisissez directement le mod&egrave;le que vous souhaitez essayer.' : 'Inscrivez-vous en quelques secondes.'; ?></p>
             </div>
             <div class="step-card">
                 <div class="num">2</div>

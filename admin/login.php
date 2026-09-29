@@ -12,7 +12,7 @@ $message = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (!csrf_verify()) {
-        $message = "Session de securite invalide, veuillez reessayer.";
+        $message = "Session de sécurité invalide, veuillez réessayer.";
     } else {
         $identifiant = trim($_POST['identifiant']);
         $password = $_POST['password'];
@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: dashboard.php");
             exit();
         } else {
-            $message = "Identifiant ou mot de passe incorrect";
+            $message = "Identifiant ou mot de passe incorrect.";
         }
     }
 }
@@ -66,6 +66,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border-radius: 8px;
             border: 1px solid #dbe3ee;
             box-shadow: 0 15px 35px rgba(15, 23, 42, 0.12);
+        }
+
+        .login-logo {
+            width: 180px;
+            margin: 0 auto 18px;
         }
 
         h1 {
@@ -143,6 +148,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
 
     <div class="login-box">
+        <img src="../images/logo.png" alt="SuperCar" class="login-logo">
         <h1>Admin</h1>
         <p class="subtitle">Connexion au back-office SuperCar</p>
 

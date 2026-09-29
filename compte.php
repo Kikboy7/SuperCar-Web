@@ -21,21 +21,21 @@ $message = "";
 // Modification du profil : uniquement en POST (avec protection CSRF).
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!csrf_verify()) {
-        $message = "Session de securite invalide, veuillez reessayer.";
+        $message = "Session de sécurité invalide, veuillez réessayer.";
     } else {
         $nom       = trim($_POST['nom'] ?? '');
         $telephone = trim($_POST['telephone'] ?? '');
         $adresse   = trim($_POST['adresse'] ?? '');
 
         if ($nom === '') {
-            $message = "Le nom ne peut pas etre vide.";
+            $message = "Le nom ne peut pas être vide.";
         } else {
             // Mise a jour des coordonnees (email non modifiable ici).
             $stmt = $pdo->prepare("
                 UPDATE client SET nom = ?, telephone = ?, adresse = ? WHERE id_client = ?
             ");
             $stmt->execute([$nom, $telephone, $adresse, $id_client]);
-            $message = "Profil mis &agrave; jour avec succ&egrave;s.";
+            $message = "Profil mis à jour avec succès.";
         }
     }
 }
@@ -81,10 +81,10 @@ $essais = $stmt->fetchAll();
 
             <div class="profile-meta">
                 <div>T&eacute;l&eacute;phone
-                    <strong><?php echo e($clientInfo['telephone'] ?: 'Non renseign&eacute;'); ?></strong>
+                    <strong><?php echo e($clientInfo['telephone'] ?: 'Non renseigné'); ?></strong>
                 </div>
                 <div>Adresse
-                    <strong><?php echo e($clientInfo['adresse'] ?: 'Non renseign&eacute;e'); ?></strong>
+                    <strong><?php echo e($clientInfo['adresse'] ?: 'Non renseignée'); ?></strong>
                 </div>
                 <div>Client depuis
                     <strong><?php echo date('d/m/Y', strtotime($clientInfo['date_creation'])); ?></strong>
@@ -127,7 +127,11 @@ $essais = $stmt->fetchAll();
                         </div>
 
                         <span class="badge badge-<?php echo str_replace(' ', '-', $e['statut']); ?>">
-                            Statut : <?php echo e($e['statut']); ?>
+                            Statut : <?php echo e([
+                                'en attente' => 'En attente',
+                                'valide' => 'Validée',
+                                'refuse' => 'Refusée'
+                            ][$e['statut']] ?? $e['statut']); ?>
                         </span>
                     </div>
                 <?php } ?>
@@ -143,7 +147,7 @@ $essais = $stmt->fetchAll();
                         <?php echo csrf_field(); ?>
 
                         <input type="text" name="nom" placeholder="Nom complet" value="<?php echo e($clientInfo['nom']); ?>" required>
-                        <input type="email" value="<?php echo e($clientInfo['email']); ?>" disabled title="L'adresse e-mail ne peut pas etre modifiee ici">
+                        <input type="email" value="<?php echo e($clientInfo['email']); ?>" disabled title="L'adresse e-mail ne peut pas être modifiée ici">
                         <input type="text" name="telephone" placeholder="T&eacute;l&eacute;phone" value="<?php echo e($clientInfo['telephone']); ?>">
                         <input type="text" name="adresse" placeholder="Adresse" value="<?php echo e($clientInfo['adresse']); ?>">
 

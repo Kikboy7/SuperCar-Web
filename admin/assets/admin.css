@@ -112,32 +112,31 @@ img { max-width: 100%; height: auto; display: block; }
 
 .sidebar-brand {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
   padding: var(--space-2) 0 var(--space-6);
   border-bottom: 1px solid rgba(255,255,255,0.12);
   margin-bottom: var(--space-4);
+  color: #fff;
 }
 
-.sidebar-brand__icon {
-  width: 36px;
-  height: 36px;
-  background: rgba(255,255,255,0.15);
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+.sidebar-brand:hover { color: #fff; }
+
+.sidebar-brand__logo {
+  width: 170px;
+  height: 62px;
+  object-fit: contain;
+  object-position: left center;
 }
 
 .sidebar-brand__text {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--text-xl);
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.72);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .sidebar-nav { list-style: none; padding: 0; margin: 0; flex: 1; }
@@ -518,7 +517,8 @@ img { max-width: 100%; height: auto; display: block; }
   .sidebar-brand__text,
   .sidebar-nav__label,
   .sidebar-footer__link span { display: none; }
-  .sidebar-brand { justify-content: center; padding-bottom: var(--space-4); }
+  .sidebar-brand { align-items: center; padding-bottom: var(--space-4); }
+  .sidebar-brand__logo { width: 48px; height: 38px; object-fit: contain; object-position: left center; }
   .sidebar-nav__link { justify-content: center; padding: var(--space-3); }
   .sidebar-footer__link { justify-content: center; }
   .content { padding: var(--space-5); }
@@ -537,6 +537,7 @@ img { max-width: 100%; height: auto; display: block; }
     border-radius: 0;
   }
   .sidebar-brand { border: none; margin: 0; padding: 0; flex: 1; }
+  .sidebar-brand__logo { width: 110px; height: 42px; object-fit: contain; }
   .sidebar-nav { display: flex; flex-wrap: wrap; gap: var(--space-1); flex: 1; justify-content: flex-end; }
   .sidebar-nav__item { margin: 0; }
   .sidebar-nav__link { padding: var(--space-2) var(--space-3); }

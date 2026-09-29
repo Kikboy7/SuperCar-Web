@@ -13,7 +13,7 @@ $saisie_identifiant = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Protection CSRF : on verifie que le formulaire vient bien du navigateur.
     if (!csrf_verify()) {
-        $message = "Session de securite invalide, veuillez reessayer.";
+        $message = "Session de sécurité invalide, veuillez réessayer.";
     } else {
         $identifiant = trim($_POST['identifiant'] ?? '');
         $password    = $_POST['password'] ?? '';

@@ -68,7 +68,7 @@ if (isset($_SESSION['client'])) {
             <ul class="nav-links">
                 <li><a href="index.php" class="<?php echo $pageCourante == 'index.php' ? 'active' : ''; ?>">Accueil</a></li>
                 <li><a href="voitures.php" class="<?php echo in_array($pageCourante, ['voitures.php', 'detail.php']) ? 'active' : ''; ?>">Voitures</a></li>
-                <li><a href="demande_essai.php" class="<?php echo $pageCourante == 'demande_essai.php' ? 'active' : ''; ?>">Demander un essai</a></li>
+                <li><a href="demande_essai.php" class="<?php echo $pageCourante == 'demande_essai.php' ? 'active' : ''; ?>">Demande d'essai</a></li>
                 <li><a href="services.php" class="<?php echo $pageCourante == 'services.php' ? 'active' : ''; ?>">Services</a></li>
                 <li><a href="contact.php" class="<?php echo $pageCourante == 'contact.php' ? 'active' : ''; ?>">Contact</a></li>
             </ul>

@@ -65,6 +65,17 @@ include 'includes/header.php';
     </div>
 </div>
 
+<!-- Accès rapide à la modification de la page d'accueil -->
+<div class="card">
+    <div class="card__header">
+        <div>
+            <h2 class="card__title">Contenu de la page d'accueil</h2>
+            <p class="form-help">Modifiez le titre, la présentation et le bandeau de réservation affichés aux visiteurs.</p>
+        </div>
+        <a href="accueil.php" class="btn btn--primary">Modifier la page d'accueil</a>
+    </div>
+</div>
+
 <!-- Derniers essais -->
 <div class="card">
     <div class="card__header">
@@ -91,7 +102,7 @@ include 'includes/header.php';
                 <tr>
                     <th>Client</th>
                     <th>Voiture</th>
-                    <th>Date essai</th>
+                    <th>Date de l'essai</th>
                     <th>Statut</th>
                     <th></th>
                 </tr>
@@ -111,7 +122,11 @@ include 'includes/header.php';
                                     default => 'badge--warning'
                                 };
                                 ?>
-                                <span class="badge <?php echo $badgeClass; ?>"><?php echo htmlspecialchars($essai['statut']); ?></span>
+                                <span class="badge <?php echo $badgeClass; ?>"><?php echo htmlspecialchars([
+                                    'en attente' => 'En attente',
+                                    'valide' => 'Validée',
+                                    'refuse' => 'Refusée'
+                                ][$essai['statut']] ?? $essai['statut']); ?></span>
                             </td>
                             <td>
                                 <a href="essais.php" class="btn btn--ghost btn--sm">Traiter</a>
@@ -143,10 +158,10 @@ include 'includes/header.php';
 
     <?php
     $stmt = $pdo->query("
-        SELECT m.*, c.nom
+        SELECT m.*, c.nom AS nom_client
         FROM message m
         LEFT JOIN client c ON m.id_client = c.id_client
-        ORDER BY m.date_envoi DESC
+        ORDER BY m.date_message DESC
         LIMIT 5
     ");
     $derniersMessages = $stmt->fetchAll();
@@ -157,7 +172,7 @@ include 'includes/header.php';
             <thead>
                 <tr>
                     <th>Expéditeur</th>
-                    <th>Sujet</th>
+                    <th>Message</th>
                     <th>Date</th>
                     <th>Statut</th>
                     <th></th>
@@ -167,19 +182,23 @@ include 'includes/header.php';
                 <?php if ($derniersMessages) { ?>
                     <?php foreach ($derniersMessages as $msg) { ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($msg['nom'] ?? 'Visiteur'); ?></td>
-                            <td class="table__cell--truncate"><?php echo htmlspecialchars($msg['sujet']); ?></td>
-                            <td><?php echo htmlspecialchars(date('d/m/Y H:i', strtotime($msg['date_envoi']))); ?></td>
+                            <td><?php echo htmlspecialchars($msg['nom_client'] ?: $msg['nom']); ?></td>
+                            <td class="table__cell--truncate"><?php echo htmlspecialchars($msg['message']); ?></td>
+                            <td><?php echo htmlspecialchars(date('d/m/Y H:i', strtotime($msg['date_message']))); ?></td>
                             <td>
                                 <?php
                                 $badgeClass = match($msg['statut_message']) {
                                     'nouveau' => 'badge--warning',
-                                    'lu' => 'badge--info',
-                                    'repondu' => 'badge--success',
+                                    'en cours' => 'badge--info',
+                                    'traite' => 'badge--success',
                                     default => 'badge--neutral'
                                 };
                                 ?>
-                                <span class="badge <?php echo $badgeClass; ?>"><?php echo htmlspecialchars($msg['statut_message']); ?></span>
+                                <span class="badge <?php echo $badgeClass; ?>"><?php echo htmlspecialchars([
+                                    'nouveau' => 'Nouveau',
+                                    'en cours' => 'En cours',
+                                    'traite' => 'Traité'
+                                ][$msg['statut_message']] ?? $msg['statut_message']); ?></span>
                             </td>
                             <td>
                                 <a href="messages.php" class="btn btn--ghost btn--sm">Lire</a>

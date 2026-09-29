@@ -295,6 +295,14 @@ section { position: relative; }
     transition: opacity .8s ease, transform 6s ease;
 }
 
+/* Chaque photo garde son sujet principal visible pendant le recadrage. */
+.hero-slide-mercedes { object-position: 58% center; }
+.hero-slide-audi { object-position: 62% center; }
+.hero-slide-bmw { object-position: 62% center; }
+.hero-slide-porsche { object-position: 68% center; }
+.hero-slide-ferrari { object-position: 60% center; }
+.hero-slide-landrover { object-position: 68% center; }
+
 .hero-slide.is-active {
     opacity: 1;
     transform: scale(1);
@@ -307,66 +315,9 @@ section { position: relative; }
     inset: 0;
     z-index: 1;
     background:
-        linear-gradient(90deg, rgba(0,0,0,0.85), rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.3)),
-        linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.6));
+        linear-gradient(90deg, rgba(0,0,0,0.82), rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.14)),
+        linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.48));
     pointer-events: none;
-}
-
-/* Fleches du carrousel */
-.hero-slider-btn {
-    position: absolute;
-    z-index: 3;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 48px;
-    height: 48px;
-    display: grid;
-    place-items: center;
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 50%;
-    color: #fff;
-    background: rgba(0,0,0,0.45);
-    backdrop-filter: blur(6px);
-    cursor: pointer;
-    font-size: 24px;
-    line-height: 1;
-    transition: all .25s ease;
-}
-
-.hero-slider-btn:hover {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #141414;
-}
-
-.hero-slider-prev { left: 22px; }
-.hero-slider-next { right: 22px; }
-
-/* Points de navigation du carrousel */
-.hero-slider-dots {
-    position: absolute;
-    z-index: 3;
-    left: 50%;
-    bottom: 30px;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 9px;
-}
-
-.hero-slider-dots button {
-    width: 12px;
-    height: 12px;
-    padding: 0;
-    border: 0;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.4);
-    cursor: pointer;
-    transition: all .25s ease;
-}
-
-.hero-slider-dots button.is-active {
-    background: var(--accent);
-    transform: scale(1.2);
 }
 
 /* Contenu au-dessus du carrousel */
@@ -423,11 +374,16 @@ section { position: relative; }
 .stat span { font-size: 13px; color: var(--texte-2); }
 
 @media (max-width: 600px) {
-    .hero-stats { grid-template-columns: 1fr; }
-    .hero { min-height: 80vh; }
-    .hero-slider-btn { width: 40px; height: 40px; font-size: 20px; }
-    .hero-slider-prev { left: 12px; }
-    .hero-slider-next { right: 12px; }
+    .hero { min-height: 86vh; }
+    .hero-content { padding: 70px 0 55px; }
+    .hero-stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 38px;
+    }
+    .stat { padding: 12px 6px; }
+    .stat strong { font-size: 22px; }
+    .stat span { font-size: 11px; }
 }
 
 /* ------------------------- CARTES VOITURES ------------------------- */

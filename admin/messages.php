@@ -81,7 +81,7 @@ include 'includes/header.php';
         </div>
         <div>
             <div class="card--stats__value"><?php echo $stats['traite']; ?></div>
-            <div class="card--stats__label">Traité</div>
+            <div class="card--stats__label">Traités</div>
         </div>
     </div>
     <div class="card card--stats card--neutral">
@@ -120,7 +120,7 @@ include 'includes/header.php';
                             <?php echo htmlspecialchars($msg['email']); ?>
                             <?php if ($msg['id_client']) { ?>
                                 <br><span class="badge badge--info">Client connecté</span>
-                                <br><span class="text-muted">Tel : <?php echo htmlspecialchars($msg['telephone'] ?? 'Non renseigné'); ?></span>
+                                <br><span class="text-muted">Tél. : <?php echo htmlspecialchars($msg['telephone'] ?? 'Non renseigné'); ?></span>
                                 <br><span class="text-muted">Adresse : <?php echo htmlspecialchars($msg['adresse'] ?? 'Non renseignée'); ?></span>
                             <?php } else { ?>
                                 <br><span class="badge badge--neutral">Visiteur</span>

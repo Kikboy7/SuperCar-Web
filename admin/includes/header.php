@@ -19,14 +19,10 @@
 
 <div class="admin-layout">
     <aside class="sidebar" role="navigation" aria-label="Menu principal administration">
-        <div class="sidebar-brand">
-            <div class="sidebar-brand__icon" aria-hidden="true">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M18 8A6 6 0 0 0 6 8"/><path d="M14 14A4 4 0 0 1 10 14"/><line x1="6" y1="18" x2="18" y2="18"/>
-                </svg>
-            </div>
-            <span class="sidebar-brand__text">SuperCar Admin</span>
-        </div>
+        <a href="dashboard.php" class="sidebar-brand" aria-label="Accueil de l'administration SuperCar">
+            <img src="../images/logo.png" alt="SuperCar" class="sidebar-brand__logo">
+            <span class="sidebar-brand__text">Administration</span>
+        </a>
 
         <nav class="sidebar-nav">
             <ul>
@@ -43,9 +39,15 @@
                     </a>
                 </li>
                 <li class="sidebar-nav__item">
+                    <a href="accueil.php" class="sidebar-nav__link <?php echo basename($_SERVER['PHP_SELF']) === 'accueil.php' ? 'sidebar-nav__link--active' : ''; ?>">
+                        <svg class="sidebar-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+                        <span class="sidebar-nav__label">Page d'accueil</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav__item">
                     <a href="essais.php" class="sidebar-nav__link <?php echo basename($_SERVER['PHP_SELF']) === 'essais.php' ? 'sidebar-nav__link--active' : ''; ?>">
                         <svg class="sidebar-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                        <span class="sidebar-nav__label">Demandes d'essai</span>
+                        <span class="sidebar-nav__label">Demande d'essai</span>
                     </a>
                 </li>
                 <li class="sidebar-nav__item">

@@ -14,7 +14,7 @@ $saisie = ['nom' => '', 'email' => '', 'identifiant' => ''];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!csrf_verify()) {
-        $message = "Session de securite invalide, veuillez reessayer.";
+        $message = "Session de sécurité invalide, veuillez réessayer.";
     } else {
         $nom        = trim($_POST['nom'] ?? '');
         $email      = trim($_POST['email'] ?? '');
@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->execute([$identifiant, $email]);
 
             if ($stmt->fetch()) {
-                $message = "Cet identifiant ou cet e-mail est d&eacute;j&agrave; utilis&eacute;.";
+                $message = "Cet identifiant ou cet e-mail est déjà utilisé.";
             } else {
                 try {
                     // Le mot de passe est hache avant d'etre enregistre.
@@ -69,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     if ($pdo->inTransaction()) {
                         $pdo->rollBack();
                     }
-                    $message = "Erreur lors de la cr&eacute;ation du compte.";
+                    $message = "Erreur lors de la création du compte.";
                 }
             }
         }

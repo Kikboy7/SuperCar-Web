@@ -91,11 +91,11 @@ $modeles_proches = $stmt->fetchAll();
                     </div>
                     <div class="spec-box">
                         <span>Carburant</span>
-                        <strong><?php echo e($car['carburant'] ?? 'Non renseign&eacute;'); ?></strong>
+                        <strong><?php echo e($car['carburant'] ?? 'Non renseigné'); ?></strong>
                     </div>
                     <div class="spec-box">
                         <span>Bo&icirc;te de vitesses</span>
-                        <strong><?php echo e($car['boite'] ?? 'Non renseign&eacute;'); ?></strong>
+                        <strong><?php echo e($car['boite'] ?? 'Non renseignée'); ?></strong>
                     </div>
                     <div class="spec-box">
                         <span>Ann&eacute;e</span>
