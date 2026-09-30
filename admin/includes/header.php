@@ -33,15 +33,15 @@
                     </a>
                 </li>
                 <li class="sidebar-nav__item">
-                    <a href="voitures.php" class="sidebar-nav__link <?php echo basename($_SERVER['PHP_SELF']) === 'voitures.php' ? 'sidebar-nav__link--active' : ''; ?>">
-                        <svg class="sidebar-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 13 10a5 5 0 0 0-5 5c0 1.1.4 2.1 1 2.8"/><path d="M9 17A3 3 0 1 1 9 11"/><path d="M19 17A3 3 0 1 1 19 11"/></svg>
-                        <span class="sidebar-nav__label">Voitures</span>
-                    </a>
-                </li>
-                <li class="sidebar-nav__item">
                     <a href="accueil.php" class="sidebar-nav__link <?php echo basename($_SERVER['PHP_SELF']) === 'accueil.php' ? 'sidebar-nav__link--active' : ''; ?>">
                         <svg class="sidebar-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
                         <span class="sidebar-nav__label">Page d'accueil</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav__item">
+                    <a href="voitures.php" class="sidebar-nav__link <?php echo basename($_SERVER['PHP_SELF']) === 'voitures.php' ? 'sidebar-nav__link--active' : ''; ?>">
+                        <svg class="sidebar-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 13 10a5 5 0 0 0-5 5c0 1.1.4 2.1 1 2.8"/><path d="M9 17A3 3 0 1 1 9 11"/><path d="M19 17A3 3 0 1 1 19 11"/></svg>
+                        <span class="sidebar-nav__label">Voitures</span>
                     </a>
                 </li>
                 <li class="sidebar-nav__item">

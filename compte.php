@@ -122,7 +122,7 @@ $essais = $stmt->fetchAll();
                         <div class="reservation-info">
                             <h3><?php echo e($e['nom_marque'] . ' ' . $e['modele']); ?></h3>
                             <p>Date : <strong><?php echo date('d/m/Y', strtotime($e['date_essai'])); ?></strong></p>
-                            <p>Heure : <strong><?php echo substr($e['heure_essai'], 0, 5); ?></strong></p>
+                            <p>Heure : <strong><?php echo $e['heure_essai'] ? substr($e['heure_essai'], 0, 5) : 'Non renseignée'; ?></strong></p>
                             <p>Demande envoy&eacute;e le <?php echo date('d/m/Y', strtotime($e['date_demande'])); ?></p>
                         </div>
 

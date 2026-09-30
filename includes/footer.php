@@ -118,6 +118,33 @@
 document.getElementById('navToggle').addEventListener('click', function () {
     document.getElementById('navCollapse').classList.toggle('open');
 });
+
+// Theme clair / sombre : le choix est conserve dans le navigateur.
+const themeToggle = document.getElementById('themeToggle');
+
+function mettreAJourBoutonTheme() {
+    const themeClair = document.documentElement.getAttribute('data-theme') === 'light';
+    const texte = themeClair ? 'Activer le thème sombre' : 'Activer le thème clair';
+
+    themeToggle.setAttribute('aria-label', texte);
+    themeToggle.setAttribute('title', texte);
+}
+
+mettreAJourBoutonTheme();
+
+themeToggle.addEventListener('click', function () {
+    const themeClair = document.documentElement.getAttribute('data-theme') === 'light';
+
+    if (themeClair) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('supercar-theme', 'dark');
+    } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('supercar-theme', 'light');
+    }
+
+    mettreAJourBoutonTheme();
+});
 </script>
 
 </body>

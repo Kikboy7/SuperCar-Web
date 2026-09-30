@@ -340,7 +340,8 @@ INSERT INTO voiture_image (url, id_voiture) VALUES
 INSERT INTO services (nom_services, description_services, prix_services) VALUES
 ('Essai personnalisé', 'Réservation d''un essai avec accompagnement par un conseiller SuperCar.', 0),
 ('Conseil d''achat', 'Accompagnement du client dans le choix du véhicule adapté à ses besoins.', 0),
-('Livraison à domicile', 'Livraison du véhicule au domicile du client après validation de l''achat.', 5000);
+('Livraison à domicile', 'Livraison du véhicule au domicile du client après validation de l''achat.', 5000),
+('Démarches administratives', 'Aide pour l''immatriculation du véhicule et accompagnement dans les démarches liées à l''assurance.', 0);
 
 DELIMITER //
 

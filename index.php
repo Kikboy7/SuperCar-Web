@@ -31,8 +31,18 @@ $stmt = $pdo->query("
 ");
 $marques = $stmt->fetchAll();
 
-// Les 3 premiers services proposes.
-$services = $pdo->query("SELECT * FROM services ORDER BY id_services LIMIT 3")->fetchAll();
+// Afficher seulement les 3 premiers services sur la page d'accueil.
+$services = $pdo->query("
+    SELECT * FROM services
+    ORDER BY FIELD(
+        nom_services,
+        'Conseil d''achat',
+        'Essai personnalisé',
+        'Démarches administratives',
+        'Livraison à domicile'
+    ), id_services
+    LIMIT 3
+")->fetchAll();
 
 // Textes modifiables depuis la partie administration.
 $contenuAccueil = $pdo->query("SELECT * FROM contenu_accueil WHERE id_contenu = 1")->fetch();
@@ -154,9 +164,9 @@ $contenuAccueil = $pdo->query("SELECT * FROM contenu_accueil WHERE id_contenu = 
         </div>
 
         <div class="service-grid">
-            <?php foreach ($services as $service) { ?>
+            <?php foreach ($services as $index => $service) { ?>
                 <article class="service-card">
-                    <div class="service-num"><?php echo $service['id_services']; ?></div>
+                    <div class="service-num"><?php echo $index + 1; ?></div>
                     <h3><?php echo e($service['nom_services']); ?></h3>
                     <p><?php echo e($service['description_services']); ?></p>
                     <span class="service-price"><?php echo $service['prix_services'] > 0 ? 'Rs ' . number_format($service['prix_services'], 0, ',', ' ') : 'Service gratuit'; ?></span>

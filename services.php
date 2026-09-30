@@ -6,7 +6,16 @@
 $pageTitle = "Services";
 include 'includes/header.php';
 
-$services = $pdo->query("SELECT * FROM services ORDER BY id_services")->fetchAll();
+$services = $pdo->query("
+    SELECT * FROM services
+    ORDER BY FIELD(
+        nom_services,
+        'Conseil d''achat',
+        'Essai personnalisé',
+        'Démarches administratives',
+        'Livraison à domicile'
+    ), id_services
+")->fetchAll();
 ?>
 
 <section class="page-hero">

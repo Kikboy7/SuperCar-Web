@@ -44,7 +44,14 @@ if (isset($_SESSION['client'])) {
 
     <!-- Bootstrap + feuille de style du site -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
+    <link href="style.css?v=<?php echo filemtime(__DIR__ . '/../style.css'); ?>" rel="stylesheet">
+
+    <script>
+    // Appliquer le theme memorise avant l'affichage de la page.
+    if (localStorage.getItem('supercar-theme') === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+    }
+    </script>
 </head>
 <body>
 
@@ -75,6 +82,11 @@ if (isset($_SESSION['client'])) {
 
             <!-- Zone compte (a droite sur ecran large) -->
             <div class="nav-actions">
+                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Activer le thème clair" title="Activer le thème clair">
+                    <span class="theme-icon theme-icon-light" aria-hidden="true">&#9788;</span>
+                    <span class="theme-icon theme-icon-dark" aria-hidden="true">&#9790;</span>
+                </button>
+
                 <?php if ($client) { ?>
                     <a href="compte.php" class="nav-user">
                         &#128100; <?php echo e($client['nom']); ?>

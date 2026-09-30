@@ -71,3 +71,12 @@ UPDATE services
 SET nom_services = 'Livraison à domicile',
     description_services = 'Livraison du véhicule au domicile du client après validation de l''achat.'
 WHERE id_services = 3;
+
+INSERT INTO services (nom_services, description_services, prix_services)
+SELECT
+    'Démarches administratives',
+    'Aide pour l''immatriculation du véhicule et accompagnement dans les démarches liées à l''assurance.',
+    0
+WHERE NOT EXISTS (
+    SELECT 1 FROM services WHERE nom_services = 'Démarches administratives'
+);
