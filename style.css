@@ -25,13 +25,16 @@
     --font-texte:  'Inter', 'Segoe UI', Arial, sans-serif;
 }
 
-/* Couleurs utilisees lorsque le visiteur active le theme clair. */
+/* Couleurs utilisees lorsque le visiteur active le theme clair.
+   L'orange est un peu plus fonce : sur fond blanc, l'orange d'origine
+   (#f39c12) n'est pas assez lisible (prix, tags, liens). */
 html[data-theme="light"] {
     --noir:        #f4f6f8;
     --noir-2:      #e9edf2;
     --carte:       #ffffff;
     --carte-2:     #f1f3f6;
     --bordure:     #d7dce2;
+    --accent:      #d97706;
     --texte:       #1b1f24;
     --texte-2:     #5e6671;
     --texte-3:     #7b8490;
@@ -1044,6 +1047,120 @@ html[data-theme="light"] .profile-meta strong { color: var(--texte); }
 @media (max-width: 760px) {
     .account-grid { grid-template-columns: 1fr; }
 }
+
+/* ------------------------- FOOTER -------------------------
+   Le footer utilise les memes variables que le reste du site :
+   il suit donc automatiquement le theme clair / sombre. */
+.super-footer {
+    position: relative;
+    margin-top: 80px;
+    background: radial-gradient(circle at top, #141414 0%, #070707 60%, #000 100%);
+    color: var(--texte-2);
+    border-top: 1px solid var(--bordure);
+    font-family: var(--font-texte);
+    overflow: hidden;
+}
+
+/* Fine ligne orange animee en haut du footer. */
+.super-footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -40%;
+    width: 40%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    animation: footerLight 4s linear infinite;
+}
+@keyframes footerLight { from { left: -40%; } to { left: 100%; } }
+
+.footer-wrap { max-width: 1200px; margin: auto; padding: 46px 24px 24px; }
+
+.footer-main {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr auto;
+    gap: 36px;
+    align-items: center;
+    margin-bottom: 34px;
+}
+
+.footer-brand-name {
+    font-family: var(--font-titre);
+    color: var(--texte);
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+.footer-brand-line { color: var(--accent); font-size: 12px; letter-spacing: 3px; text-transform: uppercase; margin: 4px 0 14px; }
+.footer-brand p { max-width: 440px; color: var(--texte-2); font-size: 14px; line-height: 1.75; }
+
+.footer-badges { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.footer-badge {
+    padding: 9px 15px;
+    border-radius: 999px;
+    font-size: 13px;
+    color: var(--texte-2);
+    background: var(--carte-2);
+    border: 1px solid var(--bordure);
+    transition: all .3s ease;
+}
+.footer-badge:hover { color: var(--accent); border-color: var(--accent); transform: translateY(-2px); }
+
+.footer-link { color: var(--texte-3); font-size: 14px; font-weight: 500; }
+.footer-link:hover { color: var(--accent); }
+
+.footer-bottom {
+    padding-top: 22px;
+    border-top: 1px solid var(--bordure);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--texte-3);
+}
+
+@media (max-width: 900px) {
+    .footer-main { grid-template-columns: 1fr; text-align: center; }
+    .footer-brand p { margin: 0 auto; }
+    .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+}
+
+/* En mode clair : fond blanc + ombre douce au lieu du degrade noir. */
+html[data-theme="light"] .super-footer {
+    background: #ffffff;
+    box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.06);
+}
+
+/* ------------------------- ADAPTATIONS THEME CLAIR -------------------------
+   En mode sombre, les bordures suffisent a detacher les cartes du fond.
+   En mode clair (cartes blanches sur fond gris), on ajoute des ombres
+   douces et on renforce les contrastes (boutons, badges). */
+html[data-theme="light"] .btn-outline { border-color: #b9c1ca; }
+
+html[data-theme="light"] .car-card,
+html[data-theme="light"] .service-card,
+html[data-theme="light"] .form-card,
+html[data-theme="light"] .info-card,
+html[data-theme="light"] .spec-box,
+html[data-theme="light"] .reservation-card,
+html[data-theme="light"] .filters,
+html[data-theme="light"] .step-card,
+html[data-theme="light"] .profile-card,
+html[data-theme="light"] .account-tabs,
+html[data-theme="light"] .gallery-main {
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.07);
+}
+
+html[data-theme="light"] .car-card:hover {
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
+}
+
+html[data-theme="light"] .badge-en-attente,
+html[data-theme="light"] .badge-nouveau { color: #b45309; }
+html[data-theme="light"] .badge-valide { color: #15803d; }
+html[data-theme="light"] .badge-refuse { color: #b91c1c; }
+
+html[data-theme="light"] .map-frame { border: 1px solid var(--bordure); }
 
 /* ------------------------- ANIMATIONS ------------------------- */
 @keyframes fadeUp {

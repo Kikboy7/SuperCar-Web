@@ -144,6 +144,19 @@ La page d'accueil affiche un carrousel d'images de fond dans le hero :
    fleches et des points de navigation cliquables ;
 4. un voile sombre (CSS) est place au-dessus des images pour garder le texte lisible.
 
+## Theme clair / sombre
+
+Le site propose un bouton (soleil / lune) dans la barre de navigation :
+1. par defaut, le site est en theme sombre ;
+2. au clic, on ajoute `data-theme="light"` sur la balise `<html>` ;
+3. le choix est memorise dans `localStorage`, et un petit script dans le
+   `<head>` reapplique le theme avant l'affichage (pas de flash blanc) ;
+4. toutes les couleurs sont des variables CSS (`--noir`, `--carte`,
+   `--texte`, ...) : le theme clair change juste les variables ;
+5. en theme clair, l'orange est un peu plus fonce (`#d97706`) pour rester
+   lisible sur fond blanc, et les cartes ont des ombres douces ;
+6. le footer utilise les memes variables, donc il suit le theme lui aussi.
+
 ## Catalogue voitures
 
 La page `voitures.php` :
