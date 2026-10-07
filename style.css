@@ -450,7 +450,10 @@ html[data-theme="light"] .cta-banner p {
     color: #d1d5db;
 }
 
-html[data-theme="light"] .hero .btn-outline {
+/* Ces deux blocs ont une photo sombre en fond : le bouton contour
+   reste blanc meme en theme clair (sinon texte sombre sur photo sombre). */
+html[data-theme="light"] .hero .btn-outline,
+html[data-theme="light"] .cta-banner .btn-outline {
     border-color: rgba(255, 255, 255, 0.65);
     color: #ffffff;
 }
@@ -913,6 +916,9 @@ textarea { min-height: 140px; resize: vertical; }
     position: relative;
     border-radius: var(--rayon);
     overflow: hidden;
+    /* Fond toujours sombre : la photo est affichee en semi-transparence,
+       elle doit s'assombrir sur du noir dans les deux themes. */
+    background: #0a0a0a;
     border: 1px solid var(--bordure);
     transition: all var(--transition);
     min-height: 180px;

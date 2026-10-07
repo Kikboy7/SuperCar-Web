@@ -144,6 +144,11 @@ La page d'accueil affiche un carrousel d'images de fond dans le hero :
    fleches et des points de navigation cliquables ;
 4. un voile sombre (CSS) est place au-dessus des images pour garder le texte lisible.
 
+Les cartes marques utilisent des visuels premium fixes (tableau `$imagesMarques`
+dans `index.php` : une image par marque), pas les photos rue du catalogue.
+La carte a un fond noir (`background: #0a0a0a`) pour que la photo
+semi-transparente rende pareil en theme clair et en theme sombre.
+
 ## Theme clair / sombre
 
 Le site propose un bouton (soleil / lune) dans la barre de navigation :

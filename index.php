@@ -46,6 +46,18 @@ $services = $pdo->query("
 
 // Textes modifiables depuis la partie administration.
 $contenuAccueil = $pdo->query("SELECT * FROM contenu_accueil WHERE id_contenu = 1")->fetch();
+
+// Photo d'illustration de chaque carte marque : on utilise des visuels
+// premium (les memes que le carrousel), pas les photos rue du catalogue.
+$imagesMarques = [
+    'BMW'        => 'background1.webp',
+    'Audi'       => 'hero-audi.webp',
+    'Mercedes'   => 'hero-mercedes.webp',
+    'Porsche'    => 'hero-porsche.webp',
+    'Ferrari'    => 'hero-ferrari.webp',
+    'Jeep'       => 'background4.png',
+    'Land Rover' => 'hero-landrover.webp',
+];
 ?>
 
 <!-- ============ HERO + CARROUSEL ============ -->
@@ -141,9 +153,10 @@ $contenuAccueil = $pdo->query("SELECT * FROM contenu_accueil WHERE id_contenu = 
 
         <div class="brand-grid">
             <?php foreach ($marques as $marque) { ?>
+                <?php $imageMarque = $imagesMarques[$marque['nom_marque']] ?? $marque['image']; ?>
                 <a href="voitures.php?marque=<?php echo $marque['id_marque']; ?>" class="brand-card fade-up delay-<?php echo $marque['id_marque']; ?>">
-                    <?php if (!empty($marque['image'])) { ?>
-                        <img src="images/<?php echo e($marque['image']); ?>" alt="<?php echo e($marque['nom_marque']); ?>" loading="lazy">
+                    <?php if (!empty($imageMarque)) { ?>
+                        <img src="images/<?php echo e($imageMarque); ?>" alt="<?php echo e($marque['nom_marque']); ?>" loading="lazy">
                     <?php } ?>
                     <div class="overlay">
                         <h3><?php echo e($marque['nom_marque']); ?></h3>
