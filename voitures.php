@@ -131,7 +131,7 @@ function lien_pagination($page, $marque, $recherche) {
                         </div>
 
                         <div class="actions">
-                            <a href="detail.php?id=<?php echo $car['id_voiture']; ?>" class="btn btn-outline btn-sm">Voir d&eacute;tails</a>
+                            <a href="detail.php?id=<?php echo $car['id_voiture']; ?>" class="btn btn-outline btn-sm">Voir les détails</a>
                             <a href="demande_essai.php?id=<?php echo $car['id_voiture']; ?>" class="btn btn-main btn-sm">R&eacute;server</a>
                         </div>
                     </div>

@@ -31,7 +31,7 @@ $stmt = $pdo->query("
 ");
 $marques = $stmt->fetchAll();
 
-// Afficher seulement les 3 premiers services sur la page d'accueil.
+// Afficher seulement les 4 premiers services sur la page d'accueil.
 $services = $pdo->query("
     SELECT * FROM services
     ORDER BY FIELD(
@@ -39,29 +39,33 @@ $services = $pdo->query("
         'Conseil d''achat',
         'Essai personnalisé',
         'Démarches administratives',
-        'Livraison à domicile'
+        'Livraison à domicile',
+        'Reprise de votre ancien véhicule',
+        'Financement sur mesure',
+        'Garantie 12 mois',
+        'Detailing & entretien'
     ), id_services
-    LIMIT 3
+    LIMIT 4
 ")->fetchAll();
 
 // Textes modifiables depuis la partie administration.
 $contenuAccueil = $pdo->query("SELECT * FROM contenu_accueil WHERE id_contenu = 1")->fetch();
 
-// Photo d'illustration de chaque carte marque : on utilise des visuels
-// premium (les memes que le carrousel), pas les photos rue du catalogue.
+// Visuels des cartes de marques. BMW et Jeep ont des photos dédiées,
+// différentes des images du carrousel et des galeries du catalogue.
 $imagesMarques = [
-    'BMW'        => 'background1.webp',
+    'BMW'        => 'marque-bmw-m4.jpg',
     'Audi'       => 'hero-audi.webp',
     'Mercedes'   => 'hero-mercedes.webp',
     'Porsche'    => 'hero-porsche.webp',
     'Ferrari'    => 'hero-ferrari.webp',
-    'Jeep'       => 'background4.png',
+    'Jeep'       => 'marque-jeep-wrangler.jpg',
     'Land Rover' => 'hero-landrover.webp',
 ];
 ?>
 
 <!-- ============ HERO + CARROUSEL ============ -->
-<section class="hero">
+<section class="hero hero--home">
 
     <!-- Carrousel d'images de fond -->
     <div class="hero-slider">
@@ -129,7 +133,7 @@ $imagesMarques = [
                         </div>
 
                         <div class="actions">
-                            <a href="detail.php?id=<?php echo $car['id_voiture']; ?>" class="btn btn-outline btn-sm">Voir d&eacute;tails</a>
+                            <a href="detail.php?id=<?php echo $car['id_voiture']; ?>" class="btn btn-outline btn-sm">Voir les détails</a>
                             <a href="demande_essai.php?id=<?php echo $car['id_voiture']; ?>" class="btn btn-main btn-sm">R&eacute;server</a>
                         </div>
                     </div>
@@ -154,13 +158,14 @@ $imagesMarques = [
         <div class="brand-grid">
             <?php foreach ($marques as $marque) { ?>
                 <?php $imageMarque = $imagesMarques[$marque['nom_marque']] ?? $marque['image']; ?>
-                <a href="voitures.php?marque=<?php echo $marque['id_marque']; ?>" class="brand-card fade-up delay-<?php echo $marque['id_marque']; ?>">
+                <?php $photoDediee = in_array($marque['nom_marque'], ['BMW', 'Jeep'], true); ?>
+                <a href="voitures.php?marque=<?php echo $marque['id_marque']; ?>" class="brand-card <?php echo $photoDediee ? 'brand-card--dedicated' : ''; ?> fade-up delay-<?php echo $marque['id_marque']; ?>">
                     <?php if (!empty($imageMarque)) { ?>
-                        <img src="images/<?php echo e($imageMarque); ?>" alt="<?php echo e($marque['nom_marque']); ?>" loading="lazy">
+                        <img src="images/<?php echo e($imageMarque); ?>" alt="<?php echo e($marque['nom_marque'] === 'BMW' ? 'BMW M4 Coupé' : ($marque['nom_marque'] === 'Jeep' ? 'Jeep Wrangler Rubicon rouge' : $marque['nom_marque'])); ?>" loading="lazy">
                     <?php } ?>
                     <div class="overlay">
                         <h3><?php echo e($marque['nom_marque']); ?></h3>
-                        <p><?php echo (int) $marque['nb_voitures']; ?> mod&egrave;le(s)</p>
+                        <p><?php echo (int) $marque['nb_voitures']; ?> <?php echo (int) $marque['nb_voitures'] > 1 ? 'modèles' : 'modèle'; ?></p>
                     </div>
                 </a>
             <?php } ?>
@@ -176,7 +181,7 @@ $imagesMarques = [
             <h2 class="section-title">Un accompagnement &agrave; chaque &eacute;tape</h2>
         </div>
 
-        <div class="service-grid">
+        <div class="service-grid service-grid--home">
             <?php foreach ($services as $index => $service) { ?>
                 <article class="service-card">
                     <div class="service-num"><?php echo $index + 1; ?></div>
@@ -210,14 +215,25 @@ $imagesMarques = [
 (function () {
     var slides = document.querySelectorAll('.hero-slide');
     var current = 0;
+    var motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var timer;
 
-    if (slides.length > 1) {
-        setInterval(function () {
-            slides[current].classList.remove('is-active');
-            current = (current + 1) % slides.length;
-            slides[current].classList.add('is-active');
-        }, 6000);
+    function showSlide(index) {
+        slides[current].classList.remove('is-active');
+        current = (index + slides.length) % slides.length;
+        slides[current].classList.add('is-active');
     }
+
+    function updatePlayback() {
+        clearInterval(timer);
+        if (!motionPreference.matches && !document.hidden && slides.length > 1) {
+            timer = setInterval(function () { showSlide(current + 1); }, 6000);
+        }
+    }
+
+    document.addEventListener('visibilitychange', updatePlayback);
+    motionPreference.addEventListener('change', updatePlayback);
+    updatePlayback();
 })();
 </script>
 

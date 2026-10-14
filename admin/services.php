@@ -13,21 +13,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['nom_services'])) {
         $nom = trim($_POST['nom_services']);
         $description = trim($_POST['description_services']);
         $prix = $_POST['prix_services'];
+        $image = trim($_POST['image_services'] ?? '');
+        $details = trim($_POST['details_services'] ?? '');
+        $points = trim($_POST['points_services'] ?? '');
 
         if ($id_services) {
             $stmt = $pdo->prepare("
                 UPDATE services
-                SET nom_services = ?, description_services = ?, prix_services = ?
+                SET nom_services = ?, description_services = ?, details_services = ?, points_services = ?, prix_services = ?, image_services = ?
                 WHERE id_services = ?
             ");
-            $stmt->execute([$nom, $description, $prix, $id_services]);
+            $stmt->execute([$nom, $description, $details, $points, $prix, $image, $id_services]);
             $message = "<div class=\"alert alert--success\"><div class=\"alert__content\"><p class=\"alert__text\">Service modifié.</p></div></div>";
         } else {
             $stmt = $pdo->prepare("
-                INSERT INTO services (nom_services, description_services, prix_services)
-                VALUES (?, ?, ?)
+                INSERT INTO services (nom_services, description_services, details_services, points_services, prix_services, image_services)
+                VALUES (?, ?, ?, ?, ?, ?)
             ");
-            $stmt->execute([$nom, $description, $prix]);
+            $stmt->execute([$nom, $description, $details, $points, $prix, $image]);
             $message = "<div class=\"alert alert--success\"><div class=\"alert__content\"><p class=\"alert__text\">Service ajouté.</p></div></div>";
         }
     }
@@ -59,7 +62,11 @@ $services = $pdo->query("
         'Conseil d''achat',
         'Essai personnalisé',
         'Démarches administratives',
-        'Livraison à domicile'
+        'Livraison à domicile',
+        'Reprise de votre ancien véhicule',
+        'Financement sur mesure',
+        'Garantie 12 mois',
+        'Detailing & entretien'
     ), id_services
 ")->fetchAll();
 
@@ -88,9 +95,27 @@ include 'includes/header.php';
             <input type="number" id="prix_services" name="prix_services" class="form-input" placeholder="0" value="<?php echo htmlspecialchars($serviceEdit['prix_services'] ?? '0'); ?>" required min="0">
         </div>
 
+        <div class="form-group">
+            <label class="form-label" for="image_services">Image (fichier dans images/)</label>
+            <input type="text" id="image_services" name="image_services" class="form-input" placeholder="service_essai.jpg" value="<?php echo htmlspecialchars($serviceEdit['image_services'] ?? ''); ?>">
+            <?php if (!empty($serviceEdit['image_services'])) { ?>
+                <img src="../<?php echo e(image_versionnee($serviceEdit['image_services'])); ?>" alt="" class="table-thumb" style="margin-top:8px;">
+            <?php } ?>
+        </div>
+
         <div class="form-group form-group--full">
-            <label class="form-label" for="description_services">Description</label>
+            <label class="form-label" for="description_services">Description courte (cartes)</label>
             <textarea id="description_services" name="description_services" class="form-textarea" placeholder="Description"><?php echo htmlspecialchars($serviceEdit['description_services'] ?? ''); ?></textarea>
+        </div>
+
+        <div class="form-group form-group--full">
+            <label class="form-label" for="details_services">Présentation complète (fiche détail)</label>
+            <textarea id="details_services" name="details_services" class="form-textarea" placeholder="Texte affiché sur la fiche du service" style="min-height:140px;"><?php echo htmlspecialchars($serviceEdit['details_services'] ?? ''); ?></textarea>
+        </div>
+
+        <div class="form-group form-group--full">
+            <label class="form-label" for="points_services">Points forts (un par ligne, affichés en checklist)</label>
+            <textarea id="points_services" name="points_services" class="form-textarea" placeholder="Exemple :&#10;Inspection gratuite&#10;Offre sous 24 heures" style="min-height:90px;"><?php echo htmlspecialchars($serviceEdit['points_services'] ?? ''); ?></textarea>
         </div>
 
         <div class="form-actions">
@@ -113,6 +138,7 @@ include 'includes/header.php';
         <table class="table">
             <thead>
                 <tr>
+                    <th>Image</th>
                     <th>Nom</th>
                     <th>Description</th>
                     <th>Prix</th>
@@ -122,6 +148,13 @@ include 'includes/header.php';
             <tbody>
                 <?php foreach ($services as $service) { ?>
                     <tr>
+                        <td>
+                            <?php if (!empty($service['image_services'])) { ?>
+                                <img src="../<?php echo e(image_versionnee($service['image_services'])); ?>" alt="" class="table-thumb">
+                            <?php } else { ?>
+                                <span class="text-muted">—</span>
+                            <?php } ?>
+                        </td>
                         <td><strong><?php echo htmlspecialchars($service['nom_services']); ?></strong></td>
                         <td class="table__cell--truncate" style="max-width: 300px;"><?php echo htmlspecialchars($service['description_services']); ?></td>
                         <td>Rs <?php echo number_format($service['prix_services'], 0, ',', ' '); ?></td>
@@ -145,7 +178,7 @@ include 'includes/header.php';
                 <?php } ?>
                 <?php if (!$services) { ?>
                     <tr>
-                        <td colspan="4">
+                        <td colspan="5">
                             <div class="table-empty">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 1v6"/><path d="M12 17v6"/><path d="M4.22 4.22l4.24 4.24"/><path d="M15.54 15.54l4.24 4.24"/><path d="M1 12h6"/><path d="M17 12h6"/></svg>
                                 <p class="table-empty__title">Aucun service</p>

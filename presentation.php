@@ -79,7 +79,7 @@ $isLogged = isset($_SESSION['client']);
             <div class="step-card">
                 <div class="num">3</div>
                 <h3>R&eacute;server un essai</h3>
-                <p>Choisissez une date, un horaire, et c'est parti&nbsp;!</p>
+                <p>Choisissez une date et un horaire, puis profitez de votre essai.</p>
             </div>
         </div>
 

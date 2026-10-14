@@ -76,6 +76,17 @@ include 'includes/header.php';
     </div>
 </div>
 
+<!-- Accès rapide à la gestion de la page contact -->
+<div class="card">
+    <div class="card__header">
+        <div>
+            <h2 class="card__title">Contenu de la page contact</h2>
+            <p class="form-help">Gérez les textes, les coordonnées, les horaires et la carte. L’en-tête et le pied de page reprennent automatiquement les coordonnées enregistrées.</p>
+        </div>
+        <a href="contact.php" class="btn btn--primary">Modifier la page contact</a>
+    </div>
+</div>
+
 <!-- Derniers essais -->
 <div class="card">
     <div class="card__header">

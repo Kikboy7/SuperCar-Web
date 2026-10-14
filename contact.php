@@ -1,136 +1,113 @@
 <?php
-/**
- * contact.php - Formulaire de contact.
- * Affiche les coordonnees de l'entreprise et enregistre le message
- * du visiteur dans la table `message`.
- */
-$pageTitle = "Contact";
-include 'includes/header.php';
-
-$client = null;
+/** Page contact : textes administrables, coordonnées partagées et messagerie. */
+session_start();
+require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/includes/contact_config.php';
+$coordonneesSite = contact_charger($pdo);
+$pageTitle = $coordonneesSite['page_titre'];
+$contactClient = null;
 if (isset($_SESSION['client'])) {
-    $stmt = $pdo->prepare("SELECT nom, email FROM client WHERE id_client = ?");
+    $stmt = $pdo->prepare('SELECT id_client, nom, email FROM client WHERE id_client = ?');
     $stmt->execute([$_SESSION['client']]);
-    $client = $stmt->fetch();
+    $contactClient = $stmt->fetch();
 }
+$saisie = ['nom' => $contactClient['nom'] ?? '', 'email' => $contactClient['email'] ?? '', 'message' => ''];
+$erreurs = [];
+$succes = !empty($_SESSION['contact_envoye']);
+unset($_SESSION['contact_envoye']);
 
-$success = "";
-$error = "";
-$saisie = ['nom' => '', 'email' => ''];
-
-// Pre-remplir le formulaire si le visiteur est connecte.
-if ($client) {
-    $saisie = ['nom' => $client['nom'], 'email' => $client['email']];
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nom    = trim($_POST['nom'] ?? '');
-    $email  = trim($_POST['email'] ?? '');
-    $contenu = trim($_POST['message'] ?? '');
-    $id_client = $client ? $_SESSION['client'] : null;
-
-    if (!csrf_verify()) {
-        $error = "Session de sécurité invalide, veuillez réessayer.";
-    } elseif ($nom === '' || $email === '' || $contenu === '') {
-        $error = "Veuillez remplir tous les champs.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "L'adresse e-mail n'est pas valide.";
-    } else {
-        $saisie = ['nom' => $nom, 'email' => $email];
-
-        $stmt = $pdo->prepare("
-            INSERT INTO message (nom, email, message, date_message, id_client, statut_message)
-            VALUES (?, ?, ?, NOW(), ?, 'nouveau')
-        ");
-        $stmt->execute([$nom, $email, $contenu, $id_client]);
-
-        $success = "Votre message a bien été envoyé. Notre équipe vous répondra rapidement.";
-        $saisie = ['nom' => '', 'email' => ''];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    foreach (array_keys($saisie) as $cle) {
+        $saisie[$cle] = is_string($_POST[$cle] ?? null) ? trim($_POST[$cle]) : '';
+    }
+    if (!is_string($_POST['csrf'] ?? null) || !csrf_verify()) {
+        $erreurs['session'] = $coordonneesSite['erreur_session'];
+    }
+    if ($saisie['nom'] === '' || mb_strlen($saisie['nom']) > 100) {
+        $erreurs['nom'] = $coordonneesSite['erreur_nom'];
+    }
+    if (mb_strlen($saisie['email']) > 150 || !filter_var($saisie['email'], FILTER_VALIDATE_EMAIL)) {
+        $erreurs['email'] = $coordonneesSite['erreur_email'];
+    }
+    if ($saisie['message'] === '' || mb_strlen($saisie['message']) > 5000) {
+        $erreurs['message'] = $coordonneesSite['erreur_message'];
+    }
+    if (!$erreurs) {
+        $stmt = $pdo->prepare("INSERT INTO message (nom, email, message, date_message, id_client, statut_message) VALUES (?, ?, ?, NOW(), ?, 'nouveau')");
+        $stmt->execute([$saisie['nom'], $saisie['email'], $saisie['message'], $contactClient['id_client'] ?? null]);
+        $_SESSION['contact_envoye'] = true;
+        // Une actualisation ne doit pas renvoyer le même message.
+        header('Location: contact.php#nous-ecrire', true, 303);
+        exit();
     }
 }
+include __DIR__ . '/includes/header.php';
 ?>
 
-<section class="page-hero">
-    <div class="container">
-        <span class="section-tag">Contact</span>
-        <h1>Un service premium commence par une vraie &eacute;coute</h1>
-        <p>Une question sur un v&eacute;hicule, un essai ou nos services&nbsp;? Envoyez-nous un message, nous vous r&eacute;pondrons rapidement.</p>
-    </div>
-</section>
-
-<div class="container section">
-
-    <div class="contact-grid">
-
-        <!-- Coordonnees -->
+<div class="contact-page">
+    <section class="contact-heading container" aria-labelledby="contact-title">
         <div>
-            <div class="section-head" style="text-align:left; margin-bottom:30px;">
-                <span class="section-tag">Coordonn&eacute;es</span>
-                <h2 class="section-title">Nous trouver</h2>
-            </div>
-
-            <div class="info-card">
-                <span class="icon">&#128205;</span>
-                <div>
-                    <h3>Adresse</h3>
-                    <p>SuperCar &mdash; Port-Louis, &Icirc;le Maurice</p>
-                </div>
-            </div>
-
-            <div class="info-card">
-                <span class="icon">&#128222;</span>
-                <div>
-                    <h3>T&eacute;l&eacute;phone</h3>
-                    <p>+230 212 0000 &nbsp; | &nbsp; +230 5250 0000</p>
-                </div>
-            </div>
-
-            <div class="info-card">
-                <span class="icon">&#9993;</span>
-                <div>
-                    <h3>E-mail</h3>
-                    <p>contact@supercar.mu</p>
-                </div>
-            </div>
-
-            <div class="info-card">
-                <span class="icon">&#9203;</span>
-                <div>
-                    <h3>Horaires</h3>
-                    <p>Lun - Ven : 08h00 - 18h00 &nbsp; | &nbsp; Sam : 09h00 - 13h00</p>
-                </div>
-            </div>
-
-            <iframe class="map-frame" src="https://maps.google.com/maps?q=Port%20Louis%20Mauritius&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
+            <span class="section-tag"><?php echo e($coordonneesSite['surtitre']); ?></span>
+            <h1 id="contact-title"><?php echo e($coordonneesSite['titre']); ?></h1>
+            <p><?php echo e($coordonneesSite['introduction']); ?></p>
         </div>
+        <a class="contact-heading-location" href="#acces">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            <span><strong>SuperCar</strong><?php echo e($coordonneesSite['ville'] . ', ' . $coordonneesSite['pays']); ?></span>
+            <span aria-hidden="true">↗</span>
+        </a>
+    </section>
 
-        <!-- Formulaire -->
-        <div class="form-card">
-            <h2 class="form-title">Envoyer une demande</h2>
-            <p class="form-intro">Une question, une demande d'information&nbsp;? &Eacute;crivez-nous.</p>
+    <div class="container contact-layout">
+        <section class="contact-details contact-panel" aria-labelledby="coordonnees-title">
+            <h2 id="coordonnees-title"><?php echo e($coordonneesSite['coordonnees_titre']); ?></h2>
+            <p class="contact-panel-intro"><?php echo e($coordonneesSite['coordonnees_intro']); ?></p>
+            <div class="contact-detail-row">
+                <span class="contact-detail-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+                <div><h3><?php echo e($coordonneesSite['adresse_label']); ?></h3><address><?php echo e($coordonneesSite['adresse']); ?><br><?php echo e($coordonneesSite['ville'] . ', ' . $coordonneesSite['pays']); ?></address></div>
+            </div>
+            <div class="contact-detail-row">
+                <span class="contact-detail-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 3 3 4-2 3c2 3 4 5 7 7l3-2 4 3-1 3c-1 1-5 0-9-3S3 9 3 5l3-2Z"/></svg></span>
+                <div><h3><?php echo e($coordonneesSite['telephone_label']); ?></h3><a href="tel:<?php echo e(contact_telephone_lien($coordonneesSite['telephone'])); ?>"><?php echo e($coordonneesSite['telephone']); ?></a><?php if ($coordonneesSite['telephone_secondaire'] !== '') { ?><a href="tel:<?php echo e(contact_telephone_lien($coordonneesSite['telephone_secondaire'])); ?>"><?php echo e($coordonneesSite['telephone_secondaire']); ?></a><?php } ?></div>
+            </div>
+            <div class="contact-detail-row">
+                <span class="contact-detail-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 6 9 7 9-7"/></svg></span>
+                <div><h3><?php echo e($coordonneesSite['email_label']); ?></h3><a href="mailto:<?php echo e($coordonneesSite['email']); ?>"><?php echo e($coordonneesSite['email']); ?></a></div>
+            </div>
+            <div class="contact-hours">
+                <h3><?php echo e($coordonneesSite['horaires_label']); ?></h3>
+                <p><?php echo e($coordonneesSite['horaires_semaine']); ?><br><?php echo e($coordonneesSite['horaires_samedi']); ?><?php if ($coordonneesSite['horaires_complement'] !== '') { ?><br><?php echo e($coordonneesSite['horaires_complement']); ?><?php } ?></p>
+            </div>
+            <div class="contact-visit"><p><?php echo e($coordonneesSite['visite_note']); ?></p><a href="demande_essai.php"><?php echo e($coordonneesSite['visite_bouton']); ?> <span aria-hidden="true">→</span></a></div>
+        </section>
 
-            <?php if ($success) { ?>
-                <div class="alert alert-success"><?php echo $success; ?></div>
-            <?php } ?>
-
-            <?php if ($error) { ?>
-                <div class="alert alert-error"><?php echo e($error); ?></div>
-            <?php } ?>
-
-            <form method="POST">
+        <section class="contact-message contact-panel" id="nous-ecrire" aria-labelledby="message-title">
+            <span class="section-tag"><?php echo e($coordonneesSite['form_surtitre']); ?></span>
+            <h2 id="message-title"><?php echo e($coordonneesSite['form_titre']); ?></h2>
+            <p class="contact-panel-intro"><?php echo e($coordonneesSite['form_intro']); ?></p>
+            <?php if ($succes) { ?><div class="alert alert-success" role="status"><?php echo e($coordonneesSite['succes_message']); ?></div><?php } ?>
+            <?php if ($erreurs) { ?><div class="alert alert-error" role="alert"><strong><?php echo e($coordonneesSite['erreur_titre']); ?></strong><ul><?php foreach ($erreurs as $cle => $erreur) { ?><li id="contact-erreur-<?php echo e($cle); ?>"><?php echo e($erreur); ?></li><?php } ?></ul></div><?php } ?>
+            <form method="POST" action="contact.php#nous-ecrire" class="contact-form">
                 <?php echo csrf_field(); ?>
-
-                <input type="text" name="nom" placeholder="Votre nom complet" value="<?php echo e($saisie['nom']); ?>" required>
-                <input type="email" name="email" placeholder="Votre adresse e-mail" value="<?php echo e($saisie['email']); ?>" required>
-                <textarea name="message" placeholder="D&eacute;crivez votre demande..." required></textarea>
-
-                <button type="submit" class="btn btn-main btn-block">Envoyer le message</button>
+                <div class="contact-form-row">
+                    <div class="contact-field"><label for="contact-nom"><?php echo e($coordonneesSite['nom_label']); ?></label><input id="contact-nom" name="nom" type="text" autocomplete="name" maxlength="100" placeholder="<?php echo e($coordonneesSite['nom_placeholder']); ?>" value="<?php echo e($saisie['nom']); ?>" required<?php if (isset($erreurs['nom'])) { ?> aria-invalid="true" aria-describedby="contact-erreur-nom"<?php } ?>></div>
+                    <div class="contact-field"><label for="contact-email"><?php echo e($coordonneesSite['email_form_label']); ?></label><input id="contact-email" name="email" type="email" autocomplete="email" maxlength="150" placeholder="<?php echo e($coordonneesSite['email_placeholder']); ?>" value="<?php echo e($saisie['email']); ?>" required<?php if (isset($erreurs['email'])) { ?> aria-invalid="true" aria-describedby="contact-erreur-email"<?php } ?>></div>
+                </div>
+                <div class="contact-field"><label for="contact-message"><?php echo e($coordonneesSite['message_label']); ?></label><textarea id="contact-message" name="message" maxlength="5000" rows="5" placeholder="<?php echo e($coordonneesSite['message_placeholder']); ?>" required<?php if (isset($erreurs['message'])) { ?> aria-invalid="true" aria-describedby="contact-erreur-message"<?php } ?>><?php echo e($saisie['message']); ?></textarea></div>
+                <div class="contact-submit"><span><?php echo e($coordonneesSite['champs_note']); ?></span><button type="submit" class="btn btn-main"><?php echo e($coordonneesSite['envoi_bouton']); ?> <span aria-hidden="true">↗</span></button></div>
             </form>
-
-            <p class="form-note">Votre demande sera enregistr&eacute;e afin que l'&eacute;quipe SuperCar puisse la consulter.</p>
-        </div>
-
+            <p class="contact-form-note"><?php echo e($coordonneesSite['form_note']); ?></p>
+        </section>
     </div>
+
+    <section class="container contact-access" id="acces" aria-labelledby="access-title">
+        <div class="contact-map-header">
+            <div><span class="section-tag"><?php echo e($coordonneesSite['carte_surtitre']); ?></span><h2 id="access-title"><?php echo e($coordonneesSite['carte_titre']); ?></h2><p><?php echo e($coordonneesSite['carte_description']); ?></p></div>
+            <a class="btn btn-outline" href="<?php echo e(contact_itineraire_url($coordonneesSite)); ?>" target="_blank" rel="noopener noreferrer"><?php echo e($coordonneesSite['itineraire_bouton']); ?> <span aria-hidden="true">↗</span></a>
+        </div>
+        <iframe class="contact-map" src="<?php echo e(contact_carte_url($coordonneesSite)); ?>" title="<?php echo e($coordonneesSite['carte_accessibilite']); ?>" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+    </section>
 </div>
 
-<?php include 'includes/footer.php'; ?>
+<?php include __DIR__ . '/includes/footer.php'; ?>

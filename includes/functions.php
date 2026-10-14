@@ -22,6 +22,22 @@ function e($valeur) {
     return htmlspecialchars((string) $valeur, ENT_QUOTES, 'UTF-8');
 }
 
+/** Recharge les photos remplacées, même si l’ancienne version est en cache. */
+function image_versionnee($nom) {
+    $chemin = __DIR__ . '/../images/' . $nom;
+    return 'images/' . $nom . (is_file($chemin) ? '?v=' . filemtime($chemin) : '');
+}
+
+/** Même dessin vectoriel dans les trois palettes : clair, sombre et admin. */
+function supercar_logo($compact = false) {
+    static $logos = [];
+    $fichier = $compact ? 'supercar-mark.svg' : 'supercar-logo.svg';
+    if (!isset($logos[$fichier])) {
+        $logos[$fichier] = file_get_contents(__DIR__ . '/../images/' . $fichier);
+    }
+    return $logos[$fichier];
+}
+
 /**
  * csrf_token() : cree (ou recupere) le jeton de securite de la session.
  * Un jeton est un grand nombre aleatoire etre connu uniquement par une seule session,

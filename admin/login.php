@@ -45,7 +45,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin | Connexion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
         body {
@@ -54,13 +58,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', Arial, sans-serif;
             background: #eef3f8;
             color: #1f2937;
         }
 
         .login-box {
-            width: 360px;
+            box-sizing: border-box;
+            width: min(430px, calc(100% - 32px));
             background: white;
             padding: 35px;
             border-radius: 8px;
@@ -72,6 +77,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             width: 180px;
             margin: 0 auto 18px;
         }
+        .login-logo .brand-logo { display: block; width: 100%; height: auto; }
+        .login-logo .logo-accent { fill: #2563eb; }
 
         h1 {
             text-align: center;
@@ -148,7 +155,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
 
     <div class="login-box">
-        <img src="../images/logo.png" alt="SuperCar" class="login-logo">
+        <div class="login-logo" style="color:#1e3a8a;">
+            <?php echo supercar_logo(); ?>
+        </div>
         <h1>Admin</h1>
         <p class="subtitle">Connexion au back-office SuperCar</p>
 

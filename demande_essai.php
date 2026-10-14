@@ -7,7 +7,7 @@
  * Les deux operations (mise a jour du client + creation de l'essai) sont
  * realisees dans une transaction afin de garder une coherence parfaite.
  */
-$pageTitle = "Demande d'essai";
+$pageTitle = "Demande d’essais";
 include 'includes/header.php';
 
 // Il faut etre connecte pour faire une demande d'essai.
@@ -113,7 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <div class="container section">
     <div class="form-card wide">
-        <h1 class="form-title">Demander un essai</h1>
+        <h1 class="form-title">Demande d’essais</h1>
         <p class="form-intro">Choisissez une voiture, une date et un horaire disponible.</p>
 
         <?php if ($success) { ?>

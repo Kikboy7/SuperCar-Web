@@ -1,7 +1,7 @@
 <?php
 include 'includes/auth.php';
 
-$pageTitle = "Demandes d'essai";
+$pageTitle = "Demandes d’essais";
 $message = "";
 
 // Changement de statut d'une demande

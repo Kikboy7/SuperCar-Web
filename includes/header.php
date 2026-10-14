@@ -15,6 +15,8 @@ if (session_status() === PHP_SESSION_NONE) {
 // Connexion a la base + fonctions utilitaires.
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/functions.php';
+require_once __DIR__ . '/contact_config.php';
+$coordonneesSite = $coordonneesSite ?? contact_charger($pdo);
 
 // Titre de la page (par defaut s'il n'est pas defini par la page).
 $pageTitle = $pageTitle ?? 'SuperCar';
@@ -53,18 +55,24 @@ if (isset($_SESSION['client'])) {
     }
     </script>
 </head>
-<body>
+<body id="haut">
 
-<nav class="navbar">
+<nav class="navbar" aria-label="Navigation principale">
+    <div class="header-detail">
+        <div class="container header-detail-inner">
+            <span><?php echo e($coordonneesSite['adresse'] . ' · ' . $coordonneesSite['ville'] . ', ' . $coordonneesSite['pays']); ?></span>
+            <span>Véhicules premium <span aria-hidden="true">·</span> Essais sur réservation</span>
+        </div>
+    </div>
     <div class="container navbar-inner">
 
         <!-- Logo -->
-        <a href="index.php" class="logo">
-            <img src="images/logo.png" alt="SuperCar">
+        <a href="index.php" class="logo" aria-label="SuperCar — Accueil">
+            <?php echo supercar_logo(); ?>
         </a>
 
         <!-- Bouton menu mobile (hamburger) -->
-        <button class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu">
+        <button type="button" class="nav-toggle" id="navToggle" aria-label="Ouvrir le menu" aria-controls="navCollapse" aria-expanded="false">
             <span></span>
         </button>
 
@@ -74,8 +82,8 @@ if (isset($_SESSION['client'])) {
             <!-- Liens de navigation -->
             <ul class="nav-links">
                 <li><a href="index.php" class="<?php echo $pageCourante == 'index.php' ? 'active' : ''; ?>">Accueil</a></li>
-                <li><a href="voitures.php" class="<?php echo in_array($pageCourante, ['voitures.php', 'detail.php']) ? 'active' : ''; ?>">Voitures</a></li>
-                <li><a href="demande_essai.php" class="<?php echo $pageCourante == 'demande_essai.php' ? 'active' : ''; ?>">Demande d'essai</a></li>
+                <li><a href="voitures.php" class="<?php echo in_array($pageCourante, ['voitures.php', 'detail.php']) ? 'active' : ''; ?>">Catalogue</a></li>
+                <li><a href="demande_essai.php" class="<?php echo in_array($pageCourante, ['demande_essai.php', 'presentation.php']) ? 'active' : ''; ?>">Demande d’essai</a></li>
                 <li><a href="services.php" class="<?php echo $pageCourante == 'services.php' ? 'active' : ''; ?>">Services</a></li>
                 <li><a href="contact.php" class="<?php echo $pageCourante == 'contact.php' ? 'active' : ''; ?>">Contact</a></li>
             </ul>

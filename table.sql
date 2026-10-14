@@ -98,7 +98,10 @@ CREATE TABLE services (
     id_services INT AUTO_INCREMENT PRIMARY KEY,
     nom_services VARCHAR(100) NOT NULL,
     description_services TEXT,
-    prix_services INT
+    details_services TEXT,
+    points_services TEXT,
+    prix_services INT,
+    image_services VARCHAR(255)
 ) ENGINE=InnoDB;
 
 -- TABLE CONTENU DE LA PAGE D'ACCUEIL
@@ -131,6 +134,62 @@ INSERT INTO contenu_accueil (
     'Envie de tester une voiture ?',
     'Réservez votre essai en quelques clics et vivez une expérience de conduite unique.'
 );
+
+-- TABLE CONTENU DE LA PAGE CONTACT
+CREATE TABLE IF NOT EXISTS contenu_contact (
+    cle VARCHAR(64) PRIMARY KEY,
+    valeur TEXT NOT NULL,
+    date_modification DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT IGNORE INTO contenu_contact (cle, valeur) VALUES
+('page_titre', 'Contact'),
+('surtitre', 'À votre écoute'),
+('titre', 'Parlons de votre prochain projet.'),
+('introduction', 'Un véhicule vous intéresse ? Une question sur nos services ? Notre équipe vous accompagne, du premier échange à la livraison.'),
+('coordonnees_titre', 'Rencontrons-nous'),
+('coordonnees_intro', 'En concession, par téléphone ou par e-mail : échangeons comme vous le souhaitez.'),
+('adresse_label', 'Notre adresse'),
+('adresse', '58–60, Cybercité'),
+('ville', 'Ébène'),
+('pays', 'Île Maurice'),
+('telephone_label', 'Appelez-nous'),
+('telephone', '+230 212 0000'),
+('telephone_secondaire', '+230 5250 0000'),
+('email_label', 'Écrivez-nous'),
+('email', 'contact@supercar.mu'),
+('horaires_label', 'Nos horaires'),
+('horaires_semaine', 'Lun. – ven. : 08 h – 18 h'),
+('horaires_samedi', 'Samedi : 09 h – 13 h'),
+('horaires_complement', ''),
+('visite_note', 'Pour un essai, pensez à réserver votre créneau.'),
+('visite_bouton', 'Demande d’essais'),
+('form_surtitre', 'Écrivez-nous'),
+('form_titre', 'Comment pouvons-nous vous aider ?'),
+('form_intro', 'Présentez-nous votre projet. Nous prendrons le temps de vous répondre.'),
+('nom_label', 'Nom complet'),
+('nom_placeholder', 'Votre nom et votre prénom'),
+('email_form_label', 'Adresse e-mail'),
+('email_placeholder', 'vous@exemple.com'),
+('message_label', 'Votre message'),
+('message_placeholder', 'Parlez-nous du véhicule ou du service qui vous intéresse…'),
+('champs_note', 'Tous les champs sont obligatoires.'),
+('envoi_bouton', 'Envoyer mon message'),
+('form_note', 'Votre message est enregistré pour permettre à l’équipe SuperCar de vous répondre.'),
+('succes_message', 'Merci ! Votre message a bien été enregistré. Notre équipe vous répondra rapidement.'),
+('carte_surtitre', 'Venez nous rencontrer'),
+('carte_titre', 'Votre prochaine étape : SuperCar'),
+('carte_description', 'Retrouvez-nous au cœur de la Cybercité, à Ébène.'),
+('carte_recherche', '-20.2463642,57.4892986'),
+('carte_zoom', '16'),
+('carte_accessibilite', 'Localisation de SuperCar à Ébène, Île Maurice'),
+('itineraire_bouton', 'Préparer mon itinéraire'),
+('erreur_titre', 'Votre message n’a pas été envoyé.'),
+('erreur_session', 'Votre session a expiré. Veuillez réessayer.'),
+('erreur_nom', 'Saisissez votre nom complet (100 caractères maximum).'),
+('erreur_email', 'Saisissez une adresse e-mail valide.'),
+('erreur_message', 'Saisissez votre message (5 000 caractères maximum).');
+
 
 -- MARQUES
 INSERT INTO marque (nom_marque) VALUES
@@ -337,11 +396,31 @@ INSERT INTO voiture_image (url, id_voiture) VALUES
 ('landrover_evoque_6.jpg', 21);
 
 -- SERVICES
-INSERT INTO services (nom_services, description_services, prix_services) VALUES
-('Essai personnalisé', 'Réservation d''un essai avec accompagnement par un conseiller SuperCar.', 0),
-('Conseil d''achat', 'Accompagnement du client dans le choix du véhicule adapté à ses besoins.', 0),
-('Livraison à domicile', 'Livraison du véhicule au domicile du client après validation de l''achat.', 5000),
-('Démarches administratives', 'Aide pour l''immatriculation du véhicule et accompagnement dans les démarches liées à l''assurance.', 0);
+INSERT INTO services (nom_services, description_services, details_services, points_services, prix_services, image_services) VALUES
+('Essai personnalisé', 'Réservation d''un essai avec accompagnement par un conseiller SuperCar.', 'Chez SuperCar, aucun achat ne se décide sans volant. L''essai personnalisé vous permet de prendre en main le véhicule de votre choix sur un parcours adapté, en ville comme sur voie rapide.', 'Essai gratuit et sans engagement
+Parcours ville et voie rapide
+Conseiller dédié pendant l''essai', 0, 'service_essai.jpg'),
+('Conseil d''achat', 'Accompagnement du client dans le choix du véhicule adapté à ses besoins.', 'Acheter une voiture premium est un investissement : notre rôle est de vous aider à faire le bon choix, pas de vous vendre à tout prix. Nous analysons avec vous votre budget, votre usage et vos préférences, puis nous comparons ensemble les modèles du catalogue.', 'Analyse de vos besoins et de votre budget
+Comparatif transparent des modèles
+Avis clair et chiffré', 0, 'service_conseil.jpg'),
+('Livraison à domicile', 'Livraison du véhicule au domicile du client après validation de l''achat.', 'Votre voiture vous est remise où vous voulez, dans un état irréprochable : véhicule entièrement préparé, clés remises en main propre avec tous les documents, et explications pour la prise en main.', 'Véhicule préparé et contrôlé
+Remise des clés en main propre
+Explications pour la prise en main', 5000, 'service_livraison.jpg'),
+('Démarches administratives', 'Aide pour l''immatriculation du véhicule et accompagnement dans les démarches liées à l''assurance.', 'L''immatriculation et l''assurance prennent du temps : SuperCar s''en occupe pour vous. Nous constituons le dossier, effectuons les démarches et vous tenons informé jusqu''à la remise des documents.', 'Dossier constitué avec vous
+Immatriculation effectuée
+Assurance adaptée proposée', 0, 'service_demarche.jpg'),
+('Reprise de votre ancien véhicule', 'Estimation offerte de votre véhicule actuel, déduite directement du prix de votre nouvelle voiture.', 'Pas besoin de vendre votre voiture vous-même : SuperCar reprend votre véhicule actuel au juste prix, après inspection avec vous.', 'Inspection gratuite de 30 minutes
+Offre écrite sous 24 heures
+Montant déduit du prix d''achat', 0, 'service_reprise.jpg'),
+('Financement sur mesure', 'Simulation claire avec nos partenaires : crédit classique ou LOA, sans surprise.', 'Nous étudions avec vous la formule adaptée (apport, durée, mensualités), en crédit classique comme en location avec option d''achat, avec une réponse de principe rapide.', 'Simulation gratuite en 15 minutes
+Crédit ou LOA au choix
+Réponse de principe rapide', 0, 'service_financement.jpg'),
+('Garantie 12 mois', 'Roulez serein : moteur, boîte de vitesses et transmission couverts pendant un an.', 'La garantie 12 mois prend le relais après la livraison : moteur, boîte de vitesses et transmission couverts, pièces et main-d''œuvre incluses, dans notre atelier.', 'Moteur, boîte et transmission couverts
+Pièces et main-d''œuvre incluses
+Valable 12 mois après la livraison', 15000, 'service_garantie.jpg'),
+('Detailing & entretien', 'Nettoyage premium, polissage et contrôle 50 points par nos techniciens.', 'Nos techniciens bichonnent votre voiture : nettoyage complet intérieur et extérieur, polissage de la carrosserie et contrôle 50 points pour rouler en toute confiance.', 'Nettoyage intérieur et extérieur complet
+Polissage et lustrage carrosserie
+Contrôle 50 points inclus', 4500, 'service_detailing.jpg');
 
 DELIMITER //
 

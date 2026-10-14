@@ -1,0 +1,57 @@
+-- Migration additive : ne supprime aucune donnée et conserve les réglages existants.
+SET NAMES utf8mb4;
+USE supercar;
+
+CREATE TABLE IF NOT EXISTS contenu_contact (
+    cle VARCHAR(64) PRIMARY KEY,
+    valeur TEXT NOT NULL,
+    date_modification DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT IGNORE INTO contenu_contact (cle, valeur) VALUES
+('page_titre', 'Contact'),
+('surtitre', 'À votre écoute'),
+('titre', 'Parlons de votre prochain projet.'),
+('introduction', 'Un véhicule vous intéresse ? Une question sur nos services ? Notre équipe vous accompagne, du premier échange à la livraison.'),
+('coordonnees_titre', 'Rencontrons-nous'),
+('coordonnees_intro', 'En concession, par téléphone ou par e-mail : échangeons comme vous le souhaitez.'),
+('adresse_label', 'Notre adresse'),
+('adresse', '58–60, Cybercité'),
+('ville', 'Ébène'),
+('pays', 'Île Maurice'),
+('telephone_label', 'Appelez-nous'),
+('telephone', '+230 212 0000'),
+('telephone_secondaire', '+230 5250 0000'),
+('email_label', 'Écrivez-nous'),
+('email', 'contact@supercar.mu'),
+('horaires_label', 'Nos horaires'),
+('horaires_semaine', 'Lun. – ven. : 08 h – 18 h'),
+('horaires_samedi', 'Samedi : 09 h – 13 h'),
+('horaires_complement', ''),
+('visite_note', 'Pour un essai, pensez à réserver votre créneau.'),
+('visite_bouton', 'Demande d’essais'),
+('form_surtitre', 'Écrivez-nous'),
+('form_titre', 'Comment pouvons-nous vous aider ?'),
+('form_intro', 'Présentez-nous votre projet. Nous prendrons le temps de vous répondre.'),
+('nom_label', 'Nom complet'),
+('nom_placeholder', 'Votre nom et votre prénom'),
+('email_form_label', 'Adresse e-mail'),
+('email_placeholder', 'vous@exemple.com'),
+('message_label', 'Votre message'),
+('message_placeholder', 'Parlez-nous du véhicule ou du service qui vous intéresse…'),
+('champs_note', 'Tous les champs sont obligatoires.'),
+('envoi_bouton', 'Envoyer mon message'),
+('form_note', 'Votre message est enregistré pour permettre à l’équipe SuperCar de vous répondre.'),
+('succes_message', 'Merci ! Votre message a bien été enregistré. Notre équipe vous répondra rapidement.'),
+('carte_surtitre', 'Venez nous rencontrer'),
+('carte_titre', 'Votre prochaine étape : SuperCar'),
+('carte_description', 'Retrouvez-nous au cœur de la Cybercité, à Ébène.'),
+('carte_recherche', '-20.2463642,57.4892986'),
+('carte_zoom', '16'),
+('carte_accessibilite', 'Localisation de SuperCar à Ébène, Île Maurice'),
+('itineraire_bouton', 'Préparer mon itinéraire'),
+('erreur_titre', 'Votre message n’a pas été envoyé.'),
+('erreur_session', 'Votre session a expiré. Veuillez réessayer.'),
+('erreur_nom', 'Saisissez votre nom complet (100 caractères maximum).'),
+('erreur_email', 'Saisissez une adresse e-mail valide.'),
+('erreur_message', 'Saisissez votre message (5 000 caractères maximum).');

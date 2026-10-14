@@ -56,6 +56,22 @@ Un message peut aussi contenir :
 
 `admin` contient les comptes administrateurs.
 
+## Page contact dynamique
+
+La page `contact.php` présente les coordonnées de SuperCar, un formulaire accessible et une carte pleine largeur centrée à Ébène.
+
+La table `contenu_contact` contient 46 paramètres, identifiés par une clé et associés à une valeur : titres, paragraphes, coordonnées, horaires, libellés du formulaire, messages de validation et point de la carte.
+
+Le fichier `includes/contact_config.php` définit les champs autorisés et leurs valeurs par défaut. Il charge ensuite les valeurs enregistrées en base. Ces mêmes coordonnées sont utilisées dans l’en-tête et le pied de page, ce qui évite de recopier les informations dans plusieurs fichiers.
+
+Dans `admin/contact.php`, l’administrateur peut modifier ces paramètres. Les champs obligatoires, les longueurs, les numéros de téléphone, l’adresse e-mail et le zoom sont vérifiés côté serveur. La sauvegarde utilise une transaction : soit tous les paramètres sont enregistrés, soit aucun ne l’est.
+
+Le formulaire public enregistre les messages dans la table `message`. Après un envoi réussi, une redirection HTTP 303 affiche la confirmation et empêche un nouvel envoi lors de l’actualisation. Le site ne déclenche pas automatiquement l’envoi d’un e-mail : les messages sont traités depuis l’administration.
+
+Les champs sont associés à des libellés, les erreurs sont reliées aux champs concernés et la carte possède un titre accessible. Les données affichées sont échappées et les deux formulaires sont protégés par un jeton CSRF.
+
+Pour mettre à jour une base existante sans la recréer, il faut importer `migration_contact.sql` et `migration_orthographe.sql`. Ces migrations sont additives ou ciblées et conservent les autres données.
+
 ## Catalogue
 
 Le catalogue compte 7 marques et 21 voitures (3 par marque).
@@ -157,10 +173,12 @@ Le site propose un bouton (soleil / lune) dans la barre de navigation :
 3. le choix est memorise dans `localStorage`, et un petit script dans le
    `<head>` reapplique le theme avant l'affichage (pas de flash blanc) ;
 4. toutes les couleurs sont des variables CSS (`--noir`, `--carte`,
-   `--texte`, ...) : le theme clair change juste les variables ;
-5. en theme clair, l'orange est un peu plus fonce (`#d97706`) pour rester
-   lisible sur fond blanc, et les cartes ont des ombres douces ;
-6. le footer utilise les memes variables, donc il suit le theme lui aussi.
+   `--texte`, ...) : le theme clair change les variables ;
+5. en theme clair, l'orange des textes est plus fonce (`#d97706`) pour
+   rester lisible sur fond blanc ;
+6. le hero, les bandeaux et les cartes ont leur propre version claire
+   (bloc « direction visuelle du theme clair » dans `style.css`) ;
+7. le footer utilise les memes variables, donc il suit le theme lui aussi.
 
 ## Catalogue voitures
 
@@ -190,9 +208,26 @@ La page `contact.php` :
 
 ## Services
 
+Le catalogue compte 8 services (conseil, essai, demarches, livraison,
+reprise, financement, garantie, detailing).
+
 La page `services.php` :
 1. recupere les services depuis la table `services` ;
-2. affiche les services sous forme de cartes.
+2. affiche chaque service en grande carte illustree (photo + badge prix +
+   titre + description + lien « En savoir plus »), 2 cartes par ligne ;
+3. chaque service a sa photo dans la colonne `image_services`
+   (fichier du dossier `images/`) ;
+4. l'accueil affiche les 4 premiers services en petites cartes centrees.
+
+La page `service.php?id=...` est la fiche d'un service :
+1. verifie que l'id existe (sinon retour a `services.php`) ;
+2. affiche la photo, le prix, la description et la presentation complete
+   (`details_services`) ;
+3. affiche « Ce service comprend » : la checklist vient de la colonne
+   `points_services` (un point fort par ligne) ;
+4. le bouton principal est adapte : l'essai renvoie vers
+   `demande_essai.php`, les autres services vers `contact.php` ;
+5. affiche les autres services en bas, comme `detail.php` pour les voitures.
 
 ## Connexion admin
 
@@ -242,7 +277,7 @@ L'administrateur peut :
 - supprimer un message.
 
 `admin/services.php` permet :
-- d'ajouter un service ;
+- d'ajouter un service (nom, description, prix, image) ;
 - de modifier un service ;
 - de supprimer un service.
 
