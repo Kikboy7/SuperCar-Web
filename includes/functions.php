@@ -22,6 +22,47 @@ function e($valeur) {
     return htmlspecialchars((string) $valeur, ENT_QUOTES, 'UTF-8');
 }
 
+/** Sélection éditoriale de l’accueil : au maximum six marques distinctes. */
+function voitures_phares(PDO $pdo) {
+    // Une voiture emblématique par marque. Si elle n’est plus au catalogue,
+    // retenir le modèle le plus puissant, puis le plus récent de cette marque.
+    return $pdo->query("
+        SELECT v.*, m.nom_marque
+        FROM voiture v
+        JOIN marque m ON m.id_marque = v.id_marque
+        WHERE v.id_voiture = (
+            SELECT v2.id_voiture
+            FROM voiture v2
+            JOIN marque m2 ON m2.id_marque = v2.id_marque
+            WHERE v2.id_marque = m.id_marque
+            ORDER BY
+                (v2.modele = CASE m2.nom_marque
+                    WHEN 'BMW' THEN 'M8 Competition'
+                    WHEN 'Audi' THEN 'RS6 Avant'
+                    WHEN 'Mercedes' THEN 'AMG GT'
+                    WHEN 'Porsche' THEN '911 Turbo S'
+                    WHEN 'Ferrari' THEN 'F8 Tributo'
+                    WHEN 'Land Rover' THEN 'Range Rover Sport'
+                    ELSE ''
+                END) DESC,
+                COALESCE(v2.puissance, 0) DESC,
+                COALESCE(v2.annee, 0) DESC,
+                v2.id_voiture ASC
+            LIMIT 1
+        )
+        ORDER BY CASE m.nom_marque
+            WHEN 'BMW' THEN 1
+            WHEN 'Audi' THEN 2
+            WHEN 'Mercedes' THEN 3
+            WHEN 'Porsche' THEN 4
+            WHEN 'Ferrari' THEN 5
+            WHEN 'Land Rover' THEN 6
+            ELSE 7
+        END, m.nom_marque, m.id_marque
+        LIMIT 6
+    ")->fetchAll();
+}
+
 /** Recharge les photos remplacées, même si l’ancienne version est en cache. */
 function image_versionnee($nom) {
     $chemin = __DIR__ . '/../images/' . $nom;

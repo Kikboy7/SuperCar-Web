@@ -9,6 +9,7 @@ Le site est développé en PHP avec une base de données MySQL. Il contient une 
 ### Partie client
 
 - Consultation du catalogue de voitures avec recherche, filtre par marque et pagination (7 marques, 21 voitures)
+- Accueil : six modèles phares de six marques distinctes, avec remplacement automatique si un modèle sélectionné n’est plus au catalogue
 - Affichage du détail d’une voiture (galerie d’images et caractéristiques techniques)
 - Création de compte client
 - Connexion et déconnexion client

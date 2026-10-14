@@ -11,15 +11,8 @@ include 'includes/header.php';
 $totalVoitures = $pdo->query("SELECT COUNT(*) FROM voiture")->fetchColumn();
 $totalMarques  = $pdo->query("SELECT COUNT(*) FROM marque")->fetchColumn();
 
-// Les 6 dernieres voitures ajoutees, avec le nom de leur marque.
-$stmt = $pdo->query("
-    SELECT v.*, m.nom_marque
-    FROM voiture v
-    JOIN marque m ON v.id_marque = m.id_marque
-    ORDER BY v.id_voiture DESC
-    LIMIT 6
-");
-$voitures = $stmt->fetchAll();
+// Six marques différentes, avec un modèle phare pour chacune.
+$voitures = voitures_phares($pdo);
 
 // Les marques disponibles (avec une image representative).
 $stmt = $pdo->query("
@@ -112,7 +105,7 @@ $imagesMarques = [
         <div class="section-head">
             <span class="section-tag">Notre s&eacute;lection</span>
             <h2 class="section-title">Nos mod&egrave;les phares</h2>
-            <p class="section-sub">Les derni&egrave;res voitures arriv&eacute;es dans notre catalogue.</p>
+            <p class="section-sub">Des modèles emblématiques, sélectionnés chez différents constructeurs.</p>
         </div>
 
         <div class="car-grid">
