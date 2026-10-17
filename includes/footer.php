@@ -100,10 +100,10 @@ themeToggle.addEventListener('click', function () {
 
     if (themeClair) {
         document.documentElement.removeAttribute('data-theme');
-        localStorage.setItem('supercar-theme', 'dark');
+        try { localStorage.setItem('supercar-theme', 'dark'); } catch (erreur) {}
     } else {
         document.documentElement.setAttribute('data-theme', 'light');
-        localStorage.setItem('supercar-theme', 'light');
+        try { localStorage.setItem('supercar-theme', 'light'); } catch (erreur) {}
     }
 
     mettreAJourBoutonTheme();

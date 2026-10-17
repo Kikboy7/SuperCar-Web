@@ -8,9 +8,7 @@
  */
 
 // Session : permet de savoir si un client est connecte.
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once __DIR__ . '/init.php';
 
 // Connexion a la base + fonctions utilitaires.
 require_once __DIR__ . '/db.php';
@@ -39,7 +37,7 @@ if (isset($_SESSION['client'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo e($pageTitle); ?> | SuperCar</title>
 
-    <!-- Polices modernes (restent lues en local si internet indisponible) -->
+    <!-- Polices distantes ; les polices système servent de repli sans Internet. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -49,13 +47,15 @@ if (isset($_SESSION['client'])) {
     <link href="style.css?v=<?php echo filemtime(__DIR__ . '/../style.css'); ?>" rel="stylesheet">
 
     <script>
+    document.documentElement.classList.add('js');
     // Appliquer le theme memorise avant l'affichage de la page.
-    if (localStorage.getItem('supercar-theme') === 'light') {
+    try { if (localStorage.getItem('supercar-theme') === 'light') {
         document.documentElement.setAttribute('data-theme', 'light');
-    }
+    } } catch (erreur) { /* Le stockage peut être désactivé dans le navigateur. */ }
     </script>
 </head>
 <body id="haut">
+<a href="#contenu" class="skip-link">Aller au contenu</a>
 
 <nav class="navbar" aria-label="Navigation principale">
     <div class="header-detail">
@@ -82,7 +82,7 @@ if (isset($_SESSION['client'])) {
             <!-- Liens de navigation -->
             <ul class="nav-links">
                 <li><a href="index.php" class="<?php echo $pageCourante == 'index.php' ? 'active' : ''; ?>">Accueil</a></li>
-                <li><a href="voitures.php" class="<?php echo in_array($pageCourante, ['voitures.php', 'detail.php']) ? 'active' : ''; ?>">Catalogue</a></li>
+                <li><a href="voitures.php" class="<?php echo in_array($pageCourante, ['voitures.php', 'detail.php']) ? 'active' : ''; ?>">Voitures</a></li>
                 <li><a href="demande_essai.php" class="<?php echo in_array($pageCourante, ['demande_essai.php', 'presentation.php']) ? 'active' : ''; ?>">Demande d’essai</a></li>
                 <li><a href="services.php" class="<?php echo $pageCourante == 'services.php' ? 'active' : ''; ?>">Services</a></li>
                 <li><a href="contact.php" class="<?php echo $pageCourante == 'contact.php' ? 'active' : ''; ?>">Contact</a></li>
@@ -99,7 +99,7 @@ if (isset($_SESSION['client'])) {
                     <a href="compte.php" class="nav-user">
                         &#128100; <?php echo e($client['nom']); ?>
                     </a>
-                    <a href="logout.php" class="btn btn-outline btn-sm">D&eacute;connexion</a>
+                    <form method="POST" action="logout.php" class="logout-form"><?php echo csrf_field(); ?><button type="submit" class="btn btn-outline btn-sm">Déconnexion</button></form>
                 <?php } else { ?>
                     <a href="compte.php" class="btn btn-main btn-sm">Mon compte</a>
                 <?php } ?>
@@ -110,4 +110,4 @@ if (isset($_SESSION['client'])) {
     </div>
 </nav>
 
-<main>
+<main id="contenu">

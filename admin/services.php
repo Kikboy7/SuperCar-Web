@@ -9,13 +9,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['nom_services'])) {
     if (!csrf_verify()) {
         $message = "<div class=\"alert alert--danger\"><div class=\"alert__content\"><p class=\"alert__text\">Session de sécurité invalide.</p></div></div>";
     } else {
-        $id_services = $_POST['id_services'] ?? "";
-        $nom = trim($_POST['nom_services']);
-        $description = trim($_POST['description_services']);
-        $prix = $_POST['prix_services'];
-        $image = trim($_POST['image_services'] ?? '');
-        $details = trim($_POST['details_services'] ?? '');
-        $points = trim($_POST['points_services'] ?? '');
+        $id_services = saisie('id_services');
+        $nom = saisie('nom_services');
+        $description = saisie('description_services');
+        $prix = saisie('prix_services');
+        $image = saisie('image_services');
+        $details = saisie('details_services');
+        $points = saisie('points_services');
+        if ($nom === '' || mb_strlen($nom) > 100 || !ctype_digit($prix) || (float) $prix > 2147483647 || !image_locale_valide($image) || mb_strlen($description) > 5000 || mb_strlen($details) > 20000 || mb_strlen($points) > 5000 || ($id_services !== '' && !ctype_digit($id_services))) {
+            $message = '<div class="alert alert--danger"><p>Vérifiez le nom (100 caractères maximum), les textes, le prix positif ou nul et le nom d’une image existante dans images/.</p></div>';
+        } else {
 
         if ($id_services) {
             $stmt = $pdo->prepare("
@@ -33,6 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['nom_services'])) {
             $stmt->execute([$nom, $description, $details, $points, $prix, $image]);
             $message = "<div class=\"alert alert--success\"><div class=\"alert__content\"><p class=\"alert__text\">Service ajouté.</p></div></div>";
         }
+        }
     }
 }
 
@@ -42,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['supprimer_service'])) 
         $message = "<div class=\"alert alert--danger\"><div class=\"alert__content\"><p class=\"alert__text\">Session de sécurité invalide.</p></div></div>";
     } else {
         $stmt = $pdo->prepare("DELETE FROM services WHERE id_services = ?");
-        $stmt->execute([(int) $_POST['supprimer_service']]);
+        $stmt->execute([(int) saisie('supprimer_service')]);
         $message = "<div class=\"alert alert--success\"><div class=\"alert__content\"><p class=\"alert__text\">Service supprimé.</p></div></div>";
     }
 }
@@ -51,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['supprimer_service'])) 
 $serviceEdit = null;
 if (isset($_GET['edit'])) {
     $stmt = $pdo->prepare("SELECT * FROM services WHERE id_services = ?");
-    $stmt->execute([$_GET['edit']]);
+    $stmt->execute([(int) saisie('edit', $_GET)]);
     $serviceEdit = $stmt->fetch();
 }
 
@@ -96,8 +100,8 @@ include 'includes/header.php';
         </div>
 
         <div class="form-group">
-            <label class="form-label" for="image_services">Image (fichier dans images/)</label>
-            <input type="text" id="image_services" name="image_services" class="form-input" placeholder="service_essai.jpg" value="<?php echo htmlspecialchars($serviceEdit['image_services'] ?? ''); ?>">
+            <label class="form-label form-label--required" for="image_services">Image (fichier existant dans images/)</label>
+            <input type="text" id="image_services" name="image_services" class="form-input" maxlength="255" placeholder="service_essai.jpg" value="<?php echo htmlspecialchars($serviceEdit['image_services'] ?? ''); ?>" required>
             <?php if (!empty($serviceEdit['image_services'])) { ?>
                 <img src="../<?php echo e(image_versionnee($serviceEdit['image_services'])); ?>" alt="" class="table-thumb" style="margin-top:8px;">
             <?php } ?>

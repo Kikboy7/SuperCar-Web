@@ -1,6 +1,6 @@
 <?php
 // On demarre la session pour pouvoir retenir que l'admin est connecte.
-session_start();
+require_once __DIR__ . '/../includes/bootstrap.php';
 
 // On utilise la meme connexion a la base que le reste du site.
 include '../includes/db.php';
@@ -13,9 +13,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (!csrf_verify()) {
         $message = "Session de sécurité invalide, veuillez réessayer.";
+    } elseif (!connexion_autorisee('admin')) {
+        http_response_code(429);
+        $message = 'Trop de tentatives. Veuillez réessayer dans 15 minutes.';
     } else {
-        $identifiant = trim($_POST['identifiant']);
-        $password = $_POST['password'];
+        $identifiant = saisie('identifiant');
+        $password = is_string($_POST['password'] ?? null) ? $_POST['password'] : '';
 
         // On cherche un administrateur qui possede cet identifiant.
         $stmt = $pdo->prepare("SELECT * FROM admin WHERE identifiant = ?");
@@ -23,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $admin = $stmt->fetch();
 
         // password_verify() compare le mot de passe saisi avec le mot de passe hash en base.
-        if ($admin && password_verify($password, $admin['mot_de_passe'])) {
+        if ($admin && strlen($password) <= 72 && password_verify($password, $admin['mot_de_passe']) && (configuration('env') === 'local' || !password_verify('admin123', $admin['mot_de_passe']))) {
 
             // On change l'identifiant de session pour eviter la fixation de session.
             session_regenerate_id(true);
@@ -34,6 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: dashboard.php");
             exit();
         } else {
+            connexion_autorisee('admin', true);
             $message = "Identifiant ou mot de passe incorrect.";
         }
     }
@@ -167,8 +171,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <form method="POST">
             <?php echo csrf_field(); ?>
-            <input type="text" name="identifiant" placeholder="Identifiant" required>
-            <input type="password" name="password" placeholder="Mot de passe" required>
+            <label for="identifiant">Identifiant</label><input id="identifiant" type="text" name="identifiant" maxlength="100" autocomplete="username" required>
+            <label for="password">Mot de passe</label><input id="password" type="password" name="password" autocomplete="current-password" required>
 
             <button type="submit">Se connecter</button>
         </form>

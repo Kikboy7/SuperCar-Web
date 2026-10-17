@@ -4,10 +4,10 @@
  * Affiche la photo, la presentation complete, le prix et le contact
  * adapte au service (essai -> demande d'essai, sinon -> contact).
  */
-include 'includes/header.php';
+require_once __DIR__ . '/includes/init.php';
 
 // Il faut obligatoirement un id de service valide dans l'URL.
-if (!isset($_GET['id']) || !ctype_digit($_GET['id'])) {
+if (!ctype_digit(saisie('id', $_GET))) {
     header("Location: services.php");
     exit();
 }
@@ -34,6 +34,7 @@ $autres = $stmt->fetchAll();
 
 // L'essai se reserve, les autres services se demandent via le contact.
 $estEssai = stripos($service['nom_services'], 'essai') !== false;
+include 'includes/header.php';
 ?>
 
 <section class="detail-page">

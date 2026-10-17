@@ -9,13 +9,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!csrf_verify()) {
         $message = "<div class=\"alert alert--danger\"><div class=\"alert__content\"><p class=\"alert__text\">Session de sécurité invalide.</p></div></div>";
     } else {
-        $id_essai = $_POST['id_essai'];
-        $statut = $_POST['statut'];
+        $id_essai = saisie('id_essai');
+        $statut = saisie('statut');
+        if (!ctype_digit($id_essai) || !in_array($statut, ['en attente', 'valide', 'refuse'], true)) {
+            $message = '<div class="alert alert--danger"><p>Choisissez une demande et un statut valides.</p></div>';
+        } else {
 
         $stmt = $pdo->prepare("UPDATE essai SET statut = ? WHERE id_essai = ?");
         $stmt->execute([$statut, $id_essai]);
 
         $message = "<div class=\"alert alert--success\"><div class=\"alert__content\"><p class=\"alert__text\">Statut mis à jour.</p></div></div>";
+        }
     }
 }
 
@@ -136,7 +140,7 @@ include 'includes/header.php';
                                     <?php echo csrf_field(); ?>
                                     <input type="hidden" name="id_essai" value="<?php echo $essai['id_essai']; ?>">
                                     <div class="select-wrapper" style="width: 140px;">
-                                        <select name="statut" class="form-select form-select--sm">
+                                        <select name="statut" class="form-select form-select--sm" aria-label="Statut de la demande d’essai">
                                             <option value="en attente" <?php if ($essai['statut'] == 'en attente') echo 'selected'; ?>>En attente</option>
                                             <option value="valide" <?php if ($essai['statut'] == 'valide') echo 'selected'; ?>>Validée</option>
                                             <option value="refuse" <?php if ($essai['statut'] == 'refuse') echo 'selected'; ?>>Refusée</option>

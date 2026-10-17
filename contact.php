@@ -1,6 +1,6 @@
 <?php
 /** Page contact : textes administrables, coordonnées partagées et messagerie. */
-session_start();
+require_once __DIR__ . '/includes/bootstrap.php';
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/contact_config.php';
@@ -19,7 +19,7 @@ unset($_SESSION['contact_envoye']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach (array_keys($saisie) as $cle) {
-        $saisie[$cle] = is_string($_POST[$cle] ?? null) ? trim($_POST[$cle]) : '';
+        $saisie[$cle] = saisie($cle);
     }
     if (!is_string($_POST['csrf'] ?? null) || !csrf_verify()) {
         $erreurs['session'] = $coordonneesSite['erreur_session'];
@@ -68,18 +68,33 @@ include __DIR__ . '/includes/header.php';
                 <div><h3><?php echo e($coordonneesSite['adresse_label']); ?></h3><address><?php echo e($coordonneesSite['adresse']); ?><br><?php echo e($coordonneesSite['ville'] . ', ' . $coordonneesSite['pays']); ?></address></div>
             </div>
             <div class="contact-detail-row">
-                <span class="contact-detail-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 3 3 4-2 3c2 3 4 5 7 7l3-2 4 3-1 3c-1 1-5 0-9-3S3 9 3 5l3-2Z"/></svg></span>
-                <div><h3><?php echo e($coordonneesSite['telephone_label']); ?></h3><a href="tel:<?php echo e(contact_telephone_lien($coordonneesSite['telephone'])); ?>"><?php echo e($coordonneesSite['telephone']); ?></a><?php if ($coordonneesSite['telephone_secondaire'] !== '') { ?><a href="tel:<?php echo e(contact_telephone_lien($coordonneesSite['telephone_secondaire'])); ?>"><?php echo e($coordonneesSite['telephone_secondaire']); ?></a><?php } ?></div>
-            </div>
-            <div class="contact-detail-row">
                 <span class="contact-detail-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 6 9 7 9-7"/></svg></span>
                 <div><h3><?php echo e($coordonneesSite['email_label']); ?></h3><a href="mailto:<?php echo e($coordonneesSite['email']); ?>"><?php echo e($coordonneesSite['email']); ?></a></div>
             </div>
+            <section class="contact-people" aria-labelledby="contacts-title">
+                <h3 id="contacts-title"><?php echo e($coordonneesSite['telephone_label']); ?></h3>
+                <div class="contact-people-grid">
+                    <?php foreach ([1 => 'telephone', 2 => 'telephone_secondaire'] as $numero => $champTelephone) {
+                        $nomContact = $coordonneesSite['contact_' . $numero . '_nom'];
+                        $roleContact = $coordonneesSite['contact_' . $numero . '_role'];
+                        $telephoneContact = $coordonneesSite[$champTelephone];
+                        if ($nomContact === '' || $telephoneContact === '') continue;
+                    ?>
+                        <div class="contact-person">
+                            <span class="contact-person-avatar" aria-hidden="true"><?php echo e(contact_initiales($nomContact)); ?></span>
+                            <div class="contact-person-identity"><h4><?php echo e($nomContact); ?></h4><?php if ($roleContact !== '') { ?><p><?php echo e($roleContact); ?></p><?php } ?></div>
+                            <a href="tel:<?php echo e(contact_telephone_lien($telephoneContact)); ?>" aria-label="<?php echo e('Appeler ' . $nomContact . ' au ' . $telephoneContact); ?>"><?php echo e($telephoneContact); ?><span aria-hidden="true">↗</span></a>
+                        </div>
+                    <?php } ?>
+                </div>
+                <?php if ($coordonneesSite['contacts_note'] !== '') { ?><p class="contact-people-note"><?php echo e($coordonneesSite['contacts_note']); ?></p><?php } ?>
+            </section>
             <div class="contact-hours">
-                <h3><?php echo e($coordonneesSite['horaires_label']); ?></h3>
-                <p><?php echo e($coordonneesSite['horaires_semaine']); ?><br><?php echo e($coordonneesSite['horaires_samedi']); ?><?php if ($coordonneesSite['horaires_complement'] !== '') { ?><br><?php echo e($coordonneesSite['horaires_complement']); ?><?php } ?></p>
+                <span class="contact-detail-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+                <div><h3><?php echo e($coordonneesSite['horaires_label']); ?></h3>
+                    <ul><?php foreach (['horaires_semaine', 'horaires_samedi', 'horaires_complement'] as $champHoraire) { if ($coordonneesSite[$champHoraire] !== '') { ?><li><?php echo e($coordonneesSite[$champHoraire]); ?></li><?php } } ?></ul>
+                </div>
             </div>
-            <div class="contact-visit"><p><?php echo e($coordonneesSite['visite_note']); ?></p><a href="demande_essai.php"><?php echo e($coordonneesSite['visite_bouton']); ?> <span aria-hidden="true">→</span></a></div>
         </section>
 
         <section class="contact-message contact-panel" id="nous-ecrire" aria-labelledby="message-title">

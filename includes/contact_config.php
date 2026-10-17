@@ -15,7 +15,7 @@ function contact_champs() {
             'adresse' => ['label' => 'Adresse', 'defaut' => '58–60, Cybercité', 'type' => 'text', 'max' => 200, 'obligatoire' => true],
             'ville' => ['label' => 'Ville', 'defaut' => 'Ébène', 'type' => 'text', 'max' => 100, 'obligatoire' => true],
             'pays' => ['label' => 'Pays', 'defaut' => 'Île Maurice', 'type' => 'text', 'max' => 100, 'obligatoire' => true],
-            'telephone_label' => ['label' => 'Libellé du téléphone', 'defaut' => 'Appelez-nous', 'type' => 'text', 'max' => 80, 'obligatoire' => true],
+            'telephone_label' => ['label' => 'Titre des personnes à contacter', 'defaut' => 'Personnes à contacter', 'type' => 'text', 'max' => 80, 'obligatoire' => true],
             'telephone' => ['label' => 'Téléphone principal', 'defaut' => '+230 212 0000', 'type' => 'tel', 'max' => 40, 'obligatoire' => true],
             'telephone_secondaire' => ['label' => 'Téléphone secondaire', 'defaut' => '+230 5250 0000', 'type' => 'tel', 'max' => 40, 'obligatoire' => false],
             'email_label' => ['label' => 'Libellé de l’e-mail', 'defaut' => 'Écrivez-nous', 'type' => 'text', 'max' => 80, 'obligatoire' => true],
@@ -24,8 +24,13 @@ function contact_champs() {
             'horaires_semaine' => ['label' => 'Horaires en semaine', 'defaut' => 'Lun. – ven. : 08 h – 18 h', 'type' => 'text', 'max' => 150, 'obligatoire' => true],
             'horaires_samedi' => ['label' => 'Horaires du samedi', 'defaut' => 'Samedi : 09 h – 13 h', 'type' => 'text', 'max' => 150, 'obligatoire' => true],
             'horaires_complement' => ['label' => 'Horaires complémentaires', 'defaut' => '', 'type' => 'text', 'max' => 150, 'obligatoire' => false],
-            'visite_note' => ['label' => 'Conseil pour la visite', 'defaut' => 'Pour un essai, pensez à réserver votre créneau.', 'type' => 'textarea', 'max' => 300, 'obligatoire' => true],
-            'visite_bouton' => ['label' => 'Texte du lien vers les essais', 'defaut' => 'Demande d’essais', 'type' => 'text', 'max' => 80, 'obligatoire' => true],
+        ]],
+        'interlocuteurs' => ['titre' => 'Personnes à contacter', 'aide' => 'Les numéros correspondent aux téléphones principal et secondaire des coordonnées partagées. Laissez le second nom vide pour masquer cette personne.', 'champs' => [
+            'contact_1_nom' => ['label' => 'Nom de la première personne', 'defaut' => 'Camille Laurent', 'type' => 'text', 'max' => 80, 'obligatoire' => true],
+            'contact_1_role' => ['label' => 'Fonction de la première personne', 'defaut' => 'Conseillère clientèle', 'type' => 'text', 'max' => 100, 'obligatoire' => true],
+            'contact_2_nom' => ['label' => 'Nom de la seconde personne', 'defaut' => 'Julien Morel', 'type' => 'text', 'max' => 80, 'obligatoire' => false],
+            'contact_2_role' => ['label' => 'Fonction de la seconde personne', 'defaut' => 'Immatriculation', 'type' => 'text', 'max' => 100, 'obligatoire' => false],
+            'contacts_note' => ['label' => 'Note sous les interlocuteurs', 'defaut' => 'Interlocuteurs fictifs pour ce projet pédagogique.', 'type' => 'textarea', 'max' => 180, 'obligatoire' => false],
         ]],
         'formulaire' => ['titre' => 'Formulaire de contact', 'aide' => 'Tous les textes du formulaire sont modifiables ; les champs et les protections restent en place.', 'champs' => [
             'form_surtitre' => ['label' => 'Surtitre du formulaire', 'defaut' => 'Écrivez-nous', 'type' => 'text', 'max' => 80, 'obligatoire' => true],
@@ -90,6 +95,15 @@ function contact_charger(PDO $pdo) {
 
 function contact_telephone_lien($telephone) {
     return preg_replace('/[^0-9+]/', '', $telephone);
+}
+
+function contact_initiales($nom) {
+    $mots = preg_split('/\s+/u', trim($nom), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+    $initiales = mb_substr($mots[0] ?? '', 0, 1);
+    if (count($mots) > 1) {
+        $initiales .= mb_substr($mots[count($mots) - 1], 0, 1);
+    }
+    return mb_strtoupper($initiales);
 }
 
 function contact_carte_url(array $contact) {

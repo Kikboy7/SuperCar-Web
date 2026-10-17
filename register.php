@@ -6,7 +6,7 @@
  * une transaction pour qu'elles reussissent ensemble.
  */
 $pageTitle = "Inscription";
-include 'includes/header.php';
+require_once __DIR__ . '/includes/init.php';
 
 $message = "";
 $success = false;
@@ -16,16 +16,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!csrf_verify()) {
         $message = "Session de sécurité invalide, veuillez réessayer.";
     } else {
-        $nom        = trim($_POST['nom'] ?? '');
-        $email      = trim($_POST['email'] ?? '');
-        $identifiant = trim($_POST['identifiant'] ?? '');
-        $password   = $_POST['password'] ?? '';
-        $confirm    = $_POST['confirm'] ?? '';
+        $nom = saisie('nom');
+        $email = saisie('email');
+        $identifiant = saisie('identifiant');
+        $password = is_string($_POST['password'] ?? null) ? $_POST['password'] : '';
+        $confirm = is_string($_POST['confirm'] ?? null) ? $_POST['confirm'] : '';
 
         $saisie = ['nom' => $nom, 'email' => $email, 'identifiant' => $identifiant];
 
         if (empty($nom) || empty($email) || empty($identifiant) || empty($password)) {
             $message = "Veuillez remplir tous les champs.";
+        } elseif (mb_strlen($nom) > 100 || mb_strlen($identifiant) > 100 || mb_strlen($email) > 150) {
+            $message = "Le nom et l’identifiant sont limités à 100 caractères, et l’e-mail à 150 caractères.";
+        } elseif (!mb_check_encoding($password, 'UTF-8') || str_contains($password, "\0") || mb_strlen($password) < 12 || strlen($password) > 72) {
+            $message = "Choisissez un mot de passe d’au moins 12 caractères (72 octets maximum).";
         } elseif ($password !== $confirm) {
             $message = "Les mots de passe ne correspondent pas.";
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -64,7 +68,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     $pdo->commit();
 
-                    $success = true;
+                    $_SESSION['compte_cree'] = true;
+                    header('Location: login.php', true, 303);
+                    exit();
                 } catch (Exception $e) {
                     if ($pdo->inTransaction()) {
                         $pdo->rollBack();
@@ -75,12 +81,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }
+include 'includes/header.php';
 ?>
 
 <div class="auth-wrap">
     <div class="auth-box">
         <div class="form-card">
-            <h2>Cr&eacute;er un compte</h2>
+            <h1 class="form-title">Cr&eacute;er un compte</h1>
             <p class="auth-sub">Rejoignez SuperCar en quelques secondes.</p>
 
             <?php if ($message) { ?>
@@ -98,11 +105,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <form method="POST">
                     <?php echo csrf_field(); ?>
 
-                    <input type="text" name="nom" placeholder="Nom complet" value="<?php echo e($saisie['nom']); ?>" required>
-                    <input type="email" name="email" placeholder="Adresse e-mail" value="<?php echo e($saisie['email']); ?>" required>
-                    <input type="text" name="identifiant" placeholder="Identifiant" value="<?php echo e($saisie['identifiant']); ?>" required>
-                    <input type="password" name="password" placeholder="Mot de passe" required>
-                    <input type="password" name="confirm" placeholder="Confirmer le mot de passe" required>
+                    <label for="nom">Nom complet</label><input id="nom" type="text" name="nom" maxlength="100" autocomplete="name" value="<?php echo e($saisie['nom']); ?>" required>
+                    <label for="email">Adresse e-mail</label><input id="email" type="email" name="email" maxlength="150" autocomplete="email" value="<?php echo e($saisie['email']); ?>" required>
+                    <label for="identifiant">Identifiant</label><input id="identifiant" type="text" name="identifiant" maxlength="100" autocomplete="username" value="<?php echo e($saisie['identifiant']); ?>" required>
+                    <label for="password">Mot de passe</label><input id="password" type="password" name="password" minlength="12" maxlength="72" autocomplete="new-password" aria-describedby="password-aide" required>
+                    <p id="password-aide" class="muted">Au moins 12 caractères.</p>
+                    <label for="confirm">Confirmer le mot de passe</label><input id="confirm" type="password" name="confirm" minlength="12" maxlength="72" autocomplete="new-password" required>
 
                     <button type="submit" class="btn btn-main btn-block">S'inscrire</button>
                 </form>

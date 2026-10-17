@@ -9,7 +9,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['supprimer_message'])) 
     if (!csrf_verify()) {
         $messageInfo = "<div class=\"alert alert--danger\"><div class=\"alert__content\"><p class=\"alert__text\">Session de sécurité invalide.</p></div></div>";
     } else {
-        $id_message = (int) $_POST['supprimer_message'];
+        $id_message = (int) saisie('supprimer_message');
         $stmt = $pdo->prepare("DELETE FROM message WHERE id_message = ?");
         $stmt->execute([$id_message]);
         $messageInfo = "<div class=\"alert alert--success\"><div class=\"alert__content\"><p class=\"alert__text\">Message supprimé.</p></div></div>";
@@ -21,9 +21,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_message']) && !isse
     if (!csrf_verify()) {
         $messageInfo = "<div class=\"alert alert--danger\"><div class=\"alert__content\"><p class=\"alert__text\">Session de sécurité invalide.</p></div></div>";
     } else {
-        $id_message = $_POST['id_message'];
-        $statut = $_POST['statut_message'];
-        $reponse = trim($_POST['reponse_admin']);
+        $id_message = saisie('id_message');
+        $statut = saisie('statut_message');
+        $reponse = saisie('reponse_admin');
+        if (!ctype_digit($id_message) || !in_array($statut, ['nouveau', 'en cours', 'traite'], true) || mb_strlen($reponse) > 5000) {
+            $messageInfo = '<div class="alert alert--danger"><p>Choisissez un statut valide et une réponse de 5 000 caractères maximum.</p></div>';
+        } else {
 
         $stmt = $pdo->prepare("
             UPDATE message
@@ -32,6 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_message']) && !isse
         ");
         $stmt->execute([$statut, $reponse, $id_message]);
         $messageInfo = "<div class=\"alert alert--success\"><div class=\"alert__content\"><p class=\"alert__text\">Message mis à jour.</p></div></div>";
+        }
     }
 }
 
@@ -136,13 +140,13 @@ include 'includes/header.php';
                                 <?php echo csrf_field(); ?>
                                 <input type="hidden" name="id_message" value="<?php echo $msg['id_message']; ?>">
                                 <div class="select-wrapper" style="width: 100%;">
-                                    <select name="statut_message" class="form-select">
+                                    <select name="statut_message" class="form-select" aria-label="Statut du message">
                                         <option value="nouveau" <?php if ($msg['statut_message'] == 'nouveau') echo 'selected'; ?>>Nouveau</option>
                                         <option value="en cours" <?php if ($msg['statut_message'] == 'en cours') echo 'selected'; ?>>En cours</option>
                                         <option value="traite" <?php if ($msg['statut_message'] == 'traite') echo 'selected'; ?>>Traité</option>
                                     </select>
                                 </div>
-                                <textarea name="reponse_admin" class="form-textarea" placeholder="Réponse ou note interne" style="min-height: 70px;"><?php echo htmlspecialchars($msg['reponse_admin'] ?? ''); ?></textarea>
+                                <textarea name="reponse_admin" class="form-textarea" aria-label="Réponse ou note interne" maxlength="5000" placeholder="Réponse ou note interne" style="min-height: 70px;"><?php echo htmlspecialchars($msg['reponse_admin'] ?? ''); ?></textarea>
                                 <?php if (!empty($msg['date_reponse'])) { ?>
                                     <small class="text-muted">Dernière réponse : <?php echo htmlspecialchars($msg['date_reponse']); ?></small>
                                 <?php } ?>

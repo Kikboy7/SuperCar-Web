@@ -19,7 +19,7 @@ if (!defined('SUPERCAR_FUNCTIONS_LOADED')) {
  * afin d'empecher l'execution de code JavaScript injecte (faille XSS).
  */
 function e($valeur) {
-    return htmlspecialchars((string) $valeur, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars((string) $valeur, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
 /** Sélection éditoriale de l’accueil : au maximum six marques distinctes. */
@@ -105,5 +105,32 @@ function csrf_field() {
  */
 function csrf_verify() {
     $envoye = $_POST['csrf'] ?? '';
-    return hash_equals(csrf_token(), $envoye);
+    return is_string($envoye) && hash_equals(csrf_token(), $envoye);
+}
+
+/** Valeur textuelle sûre, même face à un tableau ou à un encodage invalide. */
+function saisie($cle, $source = null) {
+    $valeur = ($source ?? $_POST)[$cle] ?? '';
+    return is_string($valeur) && !str_contains($valeur, "\0") && mb_check_encoding($valeur, 'UTF-8') ? trim($valeur) : '';
+}
+function image_locale_valide($nom) {
+    return $nom !== '' && basename($nom) === $nom && preg_match('/\.(jpe?g|png|webp|gif|svg)$/i', $nom) && is_file(__DIR__ . '/../images/' . $nom);
+}
+function coordonnees_valides($nom, $telephone, $adresse) {
+    return $nom !== '' && mb_strlen($nom) <= 100 && mb_strlen($adresse) <= 255 && ($telephone === '' || (mb_strlen($telephone) <= 20 && preg_match('/^\+?[0-9][0-9 ()\.\-]{5,19}$/D', $telephone)));
+}
+
+/** Limite partagée entre sessions : 10 échecs / 15 minutes / IP et zone. */
+function connexion_autorisee($zone, $echec = false) {
+    if (configuration('env') === 'local') return true;
+    $cle = hash('sha256', __DIR__ . $zone . ($_SERVER['REMOTE_ADDR'] ?? 'inconnu'));
+    $fichier = @fopen(sys_get_temp_dir() . '/supercar-auth-' . $cle . '.json', 'c+');
+    if (!$fichier || !flock($fichier, LOCK_EX)) { if ($fichier) fclose($fichier); return false; }
+    $etat = json_decode(stream_get_contents($fichier), true);
+    if (!is_array($etat) || ($etat['debut'] ?? 0) < time() - 900) $etat = ['debut' => time(), 'echecs' => 0];
+    $autorisee = $etat['echecs'] < 10;
+    if ($echec) $etat['echecs']++;
+    rewind($fichier); ftruncate($fichier, 0); fwrite($fichier, json_encode($etat));
+    flock($fichier, LOCK_UN); fclose($fichier);
+    return $autorisee;
 }

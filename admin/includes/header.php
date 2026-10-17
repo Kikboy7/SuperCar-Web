@@ -1,3 +1,17 @@
+<?php
+// Post/Redirect/Get évite de répéter un ajout ou une suppression à l’actualisation.
+$notification = $messageInfo ?? $message ?? '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && str_contains($notification, 'alert--success')) {
+    $_SESSION['notification_admin'] = $notification;
+    header('Location: ' . basename($_SERVER['PHP_SELF']), true, 303);
+    exit();
+}
+if (isset($_SESSION['notification_admin'])) {
+    if (isset($messageInfo)) $messageInfo = $_SESSION['notification_admin'];
+    else $message = $_SESSION['notification_admin'];
+    unset($_SESSION['notification_admin']);
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -77,14 +91,15 @@
                 <svg class="sidebar-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                 <span>Voir le site</span>
             </a>
-            <a href="logout.php" class="sidebar-footer__link">
+            <form method="POST" action="logout.php"><?php echo csrf_field(); ?><button type="submit" class="sidebar-footer__link logout-button">
                 <svg class="sidebar-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 <span>Déconnexion</span>
-            </a>
+            </button></form>
         </div>
     </aside>
 
     <main class="content" role="main">
+        <form method="POST" action="logout.php" class="admin-mobile-logout"><?php echo csrf_field(); ?><button type="submit" class="btn btn--secondary btn--sm">Déconnexion</button></form>
         <div class="topbar">
             <h1 class="topbar__title"><?php echo $pageTitle ?? 'Administration'; ?></h1>
             <div class="topbar__actions">

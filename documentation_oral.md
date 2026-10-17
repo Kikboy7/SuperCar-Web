@@ -60,7 +60,7 @@ Un message peut aussi contenir :
 
 La page `contact.php` présente les coordonnées de SuperCar, un formulaire accessible et une carte pleine largeur centrée à Ébène.
 
-La table `contenu_contact` contient 46 paramètres, identifiés par une clé et associés à une valeur : titres, paragraphes, coordonnées, horaires, libellés du formulaire, messages de validation et point de la carte.
+La page contact utilise 49 paramètres dans `contenu_contact`, identifiés par une clé et associés à une valeur : titres, paragraphes, coordonnées, noms et fonctions des interlocuteurs, horaires, libellés du formulaire, messages de validation et point de la carte. Les anciens paramètres du bloc de demande d’essai restent stockés pour préserver les données, mais ne sont plus utilisés.
 
 Le fichier `includes/contact_config.php` définit les champs autorisés et leurs valeurs par défaut. Il charge ensuite les valeurs enregistrées en base. Ces mêmes coordonnées sont utilisées dans l’en-tête et le pied de page, ce qui évite de recopier les informations dans plusieurs fichiers.
 
@@ -70,7 +70,7 @@ Le formulaire public enregistre les messages dans la table `message`. Après un 
 
 Les champs sont associés à des libellés, les erreurs sont reliées aux champs concernés et la carte possède un titre accessible. Les données affichées sont échappées et les deux formulaires sont protégés par un jeton CSRF.
 
-Pour mettre à jour une base existante sans la recréer, il faut importer `migration_contact.sql` et `migration_orthographe.sql`. Ces migrations sont additives ou ciblées et conservent les autres données.
+Pour mettre à jour une base existante sans la recréer, il faut importer `migration_contact.sql`, `migration_interlocuteurs_contact.sql` et `migration_orthographe.sql`. Ces migrations sont additives ou ciblées et conservent les autres données.
 
 ## Catalogue
 
@@ -89,7 +89,7 @@ Marques du catalogue :
 - Jeep : Wrangler Rubicon, Grand Cherokee, Compass ;
 - Land Rover : Range Rover Sport, Defender 110, Evoque.
 
-La page catalogue (voitures.php) permet de filtrer par marque et de rechercher ;
+La page catalogue (voitures.php) propose une recherche unifiée, un budget maximum et des critères complémentaires ;
 les resultats sont pagines (6 par page). La page detail (detail.php) affiche le
 carrousel d'images et les specifications completes.
 
@@ -183,11 +183,16 @@ Le site propose un bouton (soleil / lune) dans la barre de navigation :
 ## Catalogue voitures
 
 La page `voitures.php` :
-1. permet une recherche par mot-cle (modele, marque, description) ;
-2. permet de filtrer par marque ;
-3. affiche les voitures par groupe de 6 avec une pagination dynamique ;
-4. la pagination utilise `LIMIT` et `OFFSET` dans la requete SQL ;
-5. chaque carte renvoie vers `detail.php?id=...`.
+1. permet une recherche par mots-clés (marque, modèle, description), y compris « BMW M3 » dans un seul champ, sans sélecteur de marque redondant ;
+2. propose un budget maximum en roupies et des critères facultatifs de motorisation et de boîte de vitesses, issus du catalogue ;
+3. propose un tri par marque/modèle, prix, année ou puissance ;
+4. affiche le nombre de résultats et les critères actifs, retirables individuellement ou tous ensemble ;
+5. affiche les voitures par groupes de 6 avec une pagination utilisant `LIMIT` et `OFFSET`, qui conserve tous les critères et le tri ;
+6. conserve les liens de marques depuis l’accueil : la marque choisie apparaît comme un critère actif, sans menu supplémentaire ;
+7. valide les paramètres reçus, utilise des requêtes préparées et limite les tris à une liste autorisée ;
+8. chaque carte renvoie vers `detail.php?id=...`.
+
+Le formulaire reste fonctionnel sans JavaScript. Lorsque JavaScript est disponible, le changement de tri soumet directement les critères courants ; les autres critères s’appliquent avec « Rechercher ».
 
 ## Detail voiture
 

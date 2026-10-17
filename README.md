@@ -4,11 +4,13 @@ SuperCar-Web est un projet BTS SIO de site web dynamique pour un concessionnaire
 
 Le site est développé en PHP avec une base de données MySQL. Il contient une partie client et une partie administrateur.
 
+Pour la mise en ligne, suivre **[HEBERGEMENT.md](HEBERGEMENT.md)** : configuration privée, installation neuve sans compte prédéfini, création de l’administrateur et contrôles sur l’URL finale. Le rapport de recette est dans [RECETTE_FINALE.md](RECETTE_FINALE.md).
+
 ## Fonctionnalités
 
 ### Partie client
 
-- Consultation du catalogue de voitures avec recherche, filtre par marque et pagination (7 marques, 21 voitures)
+- Consultation du catalogue avec recherche unifiée (marque, modèle ou mot-clé), budget maximum, motorisation, boîte de vitesses, tri et pagination (7 marques, 21 voitures)
 - Accueil : six modèles phares de six marques distinctes, avec remplacement automatique si un modèle sélectionné n’est plus au catalogue
 - Affichage du détail d’une voiture (galerie d’images et caractéristiques techniques)
 - Création de compte client
@@ -29,7 +31,7 @@ Le site est développé en PHP avec une base de données MySQL. Il contient une 
 - Consultation et suppression des messages
 - Gestion des services
 - Gestion des textes de la page d’accueil
-- Gestion de la page contact : 46 paramètres (titres, textes, coordonnées, horaires, carte, formulaire et confirmations)
+- Gestion de la page contact : 49 paramètres (titres, textes, coordonnées, interlocuteurs, horaires, carte, formulaire et confirmations)
 - Synchronisation des coordonnées du header et du footer
 
 ## Technologies utilisées
@@ -74,9 +76,9 @@ Les tables principales sont :
 1. Placer le dossier du projet dans le dossier `www` de WampServer.
 2. Démarrer Apache et MySQL avec WampServer.
 3. Ouvrir phpMyAdmin.
-4. Importer le fichier `table.sql`.
+4. Sélectionner une base vide et importer `schema.sql` (11 tables, sans compte de test).
 5. Importer `contenu_site.sql` pour retrouver le catalogue, les huit services et les textes actuels du site.
-6. Vérifier la connexion dans `includes/db.php`.
+6. Copier `config.example.php` en `config.local.php`, renseigner la base locale, mettre `env` à `local` et `cookie_secure` à `false` uniquement pour HTTP local. La configuration privée n’est pas envoyée sur GitHub.
 7. Ouvrir le site dans le navigateur :
 
 ```text
@@ -85,29 +87,19 @@ http://localhost/SiteWeb%20Supercar/
 
 ## Mise à jour d’une installation existante
 
-`contenu_site.sql` est un instantané du contenu public du site au 14 octobre 2026 : catalogue, services, accueil et coordonnées. Il ne contient aucun compte, mot de passe, message privé ou réservation. Après les migrations de structure nécessaires, son import remplace les valeurs des contenus correspondants : sauvegardez les contenus personnalisés du PC cible avant de l’importer.
+`contenu_site.sql` est un instantané du contenu public du site au 17 octobre 2026 : catalogue, services, accueil et coordonnées. Il conserve les dernières valeurs saisies dans l’administration, sans compte, mot de passe, message privé ni réservation. Après les migrations de structure nécessaires, son import remplace les valeurs des contenus correspondants : sauvegardez les contenus personnalisés du PC cible avant de l’importer.
 
-Ne réimportez pas `table.sql` sur une base contenant des données à conserver : ce script recrée entièrement la base. Pour cette évolution, importez uniquement `migration_contact.sql` puis `migration_orthographe.sql` dans phpMyAdmin. Les migrations ajoutent les paramètres manquants et appliquent des corrections ciblées sans supprimer de données ni écraser les coordonnées déjà personnalisées.
+Ne réimportez pas `table.sql` sur une base contenant des données à conserver : ce script recrée entièrement la base. Pour cette évolution, importez `migration_contact.sql`, `migration_interlocuteurs_contact.sql` puis `migration_orthographe.sql` dans phpMyAdmin. Les migrations ajoutent les paramètres manquants et appliquent des corrections ciblées sans supprimer de données ni écraser les coordonnées déjà personnalisées.
 
 La nouvelle rubrique **Page contact** de l’administration permet de modifier les textes, les coordonnées, les horaires et le point de la carte. Le point peut être une adresse ou des coordonnées géographiques ; aucun code HTML d’iframe n’est requis. Les téléphones, l’e-mail et le zoom sont contrôlés avant la sauvegarde, réalisée dans une transaction.
 
+La section **Personnes à contacter** permet de modifier les noms, les fonctions et la mention pédagogique. Les numéros sont ceux des téléphones principal et secondaire. Les personnes affichées par défaut sont fictives. La mini-carte de demande d’essai n’est plus affichée.
+
 Les données saisies dans ce formulaire sont stockées dans `message` et consultables dans l’administration ; le site n’envoie pas automatiquement d’e-mails. L’envoi utilise une redirection après POST pour empêcher les doublons à l’actualisation.
 
-## Connexion administrateur de test
+## Administrateur
 
-Identifiant :
-
-```text
-admin
-```
-
-Mot de passe :
-
-```text
-admin123
-```
-
-Ce compte sert uniquement aux tests en local.
+L’installation neuve ne crée aucun administrateur. Utiliser `tools/creer-admin.php` avec un mot de passe privé fourni temporairement via `SUPERCAR_ADMIN_PASSWORD` (voir le guide d’hébergement). Le script historique `table.sql`, destructif, reste réservé à la démonstration locale : son compte `admin/admin123` est refusé en production.
 
 ## Points importants du projet
 
@@ -118,6 +110,9 @@ Ce compte sert uniquement aux tests en local.
 - Les requêtes préparées avec `prepare()` et `execute()` limitent les risques d'injection SQL.
 - Toutes les données affichées sont échappées avec `htmlspecialchars` (fonction `e()`).
 - Les formulaires et actions sensibles sont protégés par un jeton CSRF.
+- La déconnexion est une action POST avec CSRF ; la session utilise des cookies HttpOnly / SameSite et Secure en HTTPS.
+- Les formulaires contrôlent leurs champs côté serveur, et les ajouts utilisent une redirection pour éviter les doublons à l’actualisation.
+- Les connexions en production sont limitées à 10 échecs par IP et par zone sur 15 minutes.
 - Les demandes d’essai sont liées au client connecté et à la voiture choisie.
 - Les horaires d’essai sont limités à des créneaux fixes de 08 h à 18 h.
 - Les caractéristiques des voitures (année, carburant, boîte, puissance) sont stockées en base.

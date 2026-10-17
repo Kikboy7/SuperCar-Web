@@ -6,7 +6,7 @@
  * Si le visiteur n'est pas connecte, on le renvoie vers la page de connexion.
  */
 $pageTitle = "Mon compte";
-include 'includes/header.php';
+require_once __DIR__ . '/includes/init.php';
 
 // Il faut etre connecte pour acceder a son espace.
 if (!isset($_SESSION['client'])) {
@@ -16,26 +16,32 @@ if (!isset($_SESSION['client'])) {
 
 $id_client = $_SESSION['client'];
 
-$message = "";
+$message = $_SESSION['profil_message'] ?? '';
+unset($_SESSION['profil_message']);
+$messageErreur = false;
 
 // Modification du profil : uniquement en POST (avec protection CSRF).
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!csrf_verify()) {
         $message = "Session de sécurité invalide, veuillez réessayer.";
+        $messageErreur = true;
     } else {
-        $nom       = trim($_POST['nom'] ?? '');
-        $telephone = trim($_POST['telephone'] ?? '');
-        $adresse   = trim($_POST['adresse'] ?? '');
+        $nom = saisie('nom');
+        $telephone = saisie('telephone');
+        $adresse = saisie('adresse');
 
-        if ($nom === '') {
-            $message = "Le nom ne peut pas être vide.";
+        if (!coordonnees_valides($nom, $telephone, $adresse)) {
+            $message = "Vérifiez le nom (100 caractères maximum), le téléphone (20 caractères) et l’adresse (255 caractères).";
+            $messageErreur = true;
         } else {
             // Mise a jour des coordonnees (email non modifiable ici).
             $stmt = $pdo->prepare("
                 UPDATE client SET nom = ?, telephone = ?, adresse = ? WHERE id_client = ?
             ");
             $stmt->execute([$nom, $telephone, $adresse, $id_client]);
-            $message = "Profil mis à jour avec succès.";
+            $_SESSION['profil_message'] = 'Profil mis à jour avec succès.';
+            header('Location: compte.php#tab-profil', true, 303);
+            exit();
         }
     }
 }
@@ -44,6 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 $stmt = $pdo->prepare("SELECT * FROM client WHERE id_client = ?");
 $stmt->execute([$id_client]);
 $clientInfo = $stmt->fetch();
+if (!$clientInfo) { unset($_SESSION['client']); header('Location: login.php'); exit(); }
 
 // Demandes d'essai du client, avec la voiture et la marque associees.
 $stmt = $pdo->prepare("
@@ -56,6 +63,7 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$id_client]);
 $essais = $stmt->fetchAll();
+include 'includes/header.php';
 ?>
 
 <div class="container section">
@@ -66,7 +74,7 @@ $essais = $stmt->fetchAll();
     </div>
 
     <?php if ($message) { ?>
-        <div class="alert alert-success"><?php echo $message; ?></div>
+        <div class="alert <?php echo $messageErreur ? 'alert-error' : 'alert-success'; ?>" role="status"><?php echo e($message); ?></div>
     <?php } ?>
 
     <div class="account-grid">
@@ -74,7 +82,7 @@ $essais = $stmt->fetchAll();
         <!-- ===== Carte profil ===== -->
         <div class="profile-card">
             <div class="profile-avatar">
-                <?php echo e(strtoupper(substr($clientInfo['nom'], 0, 1))); ?>
+                <?php echo e(mb_strtoupper(mb_substr($clientInfo['nom'], 0, 1))); ?>
             </div>
             <h2><?php echo e($clientInfo['nom']); ?></h2>
             <p class="muted"><?php echo e($clientInfo['email']); ?></p>
@@ -91,7 +99,7 @@ $essais = $stmt->fetchAll();
                 </div>
             </div>
 
-            <a href="logout.php" class="btn btn-outline btn-block mt-2">D&eacute;connexion</a>
+            <form method="POST" action="logout.php" class="logout-form mt-2"><?php echo csrf_field(); ?><button type="submit" class="btn btn-outline btn-block">Déconnexion</button></form>
         </div>
 
         <!-- ===== Contenu principal ===== -->
@@ -146,10 +154,10 @@ $essais = $stmt->fetchAll();
                     <form method="POST">
                         <?php echo csrf_field(); ?>
 
-                        <input type="text" name="nom" placeholder="Nom complet" value="<?php echo e($clientInfo['nom']); ?>" required>
-                        <input type="email" value="<?php echo e($clientInfo['email']); ?>" disabled title="L'adresse e-mail ne peut pas être modifiée ici">
-                        <input type="text" name="telephone" placeholder="T&eacute;l&eacute;phone" value="<?php echo e($clientInfo['telephone']); ?>">
-                        <input type="text" name="adresse" placeholder="Adresse" value="<?php echo e($clientInfo['adresse']); ?>">
+                        <label for="profil-nom">Nom complet</label><input id="profil-nom" type="text" name="nom" maxlength="100" autocomplete="name" value="<?php echo e($clientInfo['nom']); ?>" required>
+                        <label for="profil-email">Adresse e-mail (non modifiable)</label><input id="profil-email" type="email" value="<?php echo e($clientInfo['email']); ?>" disabled>
+                        <label for="profil-telephone">Téléphone</label><input id="profil-telephone" type="tel" name="telephone" maxlength="20" autocomplete="tel" value="<?php echo e($clientInfo['telephone']); ?>">
+                        <label for="profil-adresse">Adresse</label><input id="profil-adresse" type="text" name="adresse" maxlength="255" autocomplete="street-address" value="<?php echo e($clientInfo['adresse']); ?>">
 
                         <button type="submit" class="btn btn-main btn-block">Enregistrer les modifications</button>
                     </form>
@@ -166,16 +174,33 @@ $essais = $stmt->fetchAll();
     var tabs = document.querySelectorAll('.account-tabs button');
     var panels = document.querySelectorAll('.account-panel');
 
-    for (var i = 0; i < tabs.length; i++) {
-        tabs[i].addEventListener('click', function () {
-            for (var j = 0; j < tabs.length; j++) {
-                tabs[j].classList.toggle('is-active', tabs[j] === this);
-            }
-            for (var k = 0; k < panels.length; k++) {
-                panels[k].classList.toggle('is-active', panels[k].id === this.getAttribute('data-panel'));
-            }
+    document.querySelector('.account-tabs').setAttribute('role', 'tablist');
+    document.querySelector('.account-tabs').setAttribute('aria-label', 'Espace client');
+    function activer(index, focus) {
+        tabs.forEach(function (tab, i) {
+            tab.classList.toggle('is-active', i === index);
+            tab.setAttribute('aria-selected', String(i === index));
+            tab.tabIndex = i === index ? 0 : -1;
+            panels[i].classList.toggle('is-active', i === index);
         });
+        if (focus) tabs[index].focus();
     }
+    tabs.forEach(function (tab, i) {
+        tab.id = 'onglet-' + i;
+        tab.setAttribute('role', 'tab');
+        tab.setAttribute('aria-controls', panels[i].id);
+        panels[i].setAttribute('role', 'tabpanel');
+        panels[i].setAttribute('aria-labelledby', tab.id);
+        tab.addEventListener('click', function () { activer(i); });
+        tab.addEventListener('keydown', function (event) {
+            if (['ArrowRight', 'ArrowLeft', 'Home', 'End'].indexOf(event.key) < 0) return;
+            event.preventDefault();
+            activer(event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (i + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length, true);
+        });
+    });
+    function depuisAncre() { activer(location.hash === '#tab-profil' ? 1 : 0); }
+    depuisAncre();
+    window.addEventListener('hashchange', depuisAncre);
 })();
 </script>
 

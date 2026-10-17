@@ -9,16 +9,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['modele'])) {
     if (!csrf_verify()) {
         $message = "<div class=\"alert alert--danger\"><div class=\"alert__content\"><p class=\"alert__text\">Session de sécurité invalide.</p></div></div>";
     } else {
-        $id_voiture  = $_POST['id_voiture'] ?? "";
-        $modele      = trim($_POST['modele']);
-        $prix        = $_POST['prix'];
-        $description = trim($_POST['description']);
-        $image       = trim($_POST['image']);
-        $id_marque   = $_POST['id_marque'];
-        $annee       = $_POST['annee'] !== '' ? (int) $_POST['annee'] : null;
-        $carburant   = trim($_POST['carburant']);
-        $boite       = trim($_POST['boite']);
-        $puissance   = $_POST['puissance'] !== '' ? (int) $_POST['puissance'] : null;
+        $id_voiture = saisie('id_voiture');
+        $modele = saisie('modele');
+        $prix = saisie('prix');
+        $description = saisie('description');
+        $image = saisie('image');
+        $id_marque = saisie('id_marque');
+        $annee = saisie('annee') !== '' ? (int) saisie('annee') : null;
+        $carburant = saisie('carburant');
+        $boite = saisie('boite');
+        $puissance = saisie('puissance') !== '' ? (int) saisie('puissance') : null;
+        $marquesValides = $pdo->query('SELECT id_marque FROM marque')->fetchAll(PDO::FETCH_COLUMN);
+        if ($modele === '' || mb_strlen($modele) > 100 || !ctype_digit($prix) || (float) $prix > 2147483647 || !in_array($id_marque, array_map('strval', $marquesValides), true) || !image_locale_valide($image) || mb_strlen($description) > 20000 || ($annee !== null && (!ctype_digit(saisie('annee')) || $annee < 1980 || $annee > (int) date('Y') + 2)) || ($puissance !== null && (!ctype_digit(saisie('puissance')) || $puissance > 5000)) || !in_array($carburant, ['', 'Essence', 'Diesel', 'Hybride', 'Électrique'], true) || !in_array($boite, ['', 'Automatique', 'Manuelle'], true) || ($id_voiture !== '' && !ctype_digit($id_voiture))) {
+            $message = '<div class="alert alert--danger"><p>Vérifiez le modèle, le prix, la marque, les caractéristiques et le nom d’une image existante dans images/.</p></div>';
+        } else {
 
         if ($id_voiture) {
             $stmt = $pdo->prepare("
@@ -37,6 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['modele'])) {
             $stmt->execute([$modele, $prix, $description, $image, $id_marque, $annee, $carburant, $boite, $puissance]);
             $message = "<div class=\"alert alert--success\"><div class=\"alert__content\"><p class=\"alert__text\">Voiture ajoutée.</p></div></div>";
         }
+        }
     }
 }
 
@@ -45,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['supprimer_voiture'])) 
     if (!csrf_verify()) {
         $message = "<div class=\"alert alert--danger\"><div class=\"alert__content\"><p class=\"alert__text\">Session de sécurité invalide.</p></div></div>";
     } else {
-        $id_voiture = (int) $_POST['supprimer_voiture'];
+        $id_voiture = (int) saisie('supprimer_voiture');
         try {
             $pdo->beginTransaction();
 
@@ -71,7 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['supprimer_voiture'])) 
 $voitureEdit = null;
 if (isset($_GET['edit'])) {
     $stmt = $pdo->prepare("SELECT * FROM voiture WHERE id_voiture = ?");
-    $stmt->execute([$_GET['edit']]);
+    $stmt->execute([(int) saisie('edit', $_GET)]);
     $voitureEdit = $stmt->fetch();
 }
 
@@ -124,13 +129,13 @@ include 'includes/header.php';
         </div>
 
         <div class="form-group">
-            <label class="form-label" for="image">Image principale</label>
-            <input type="text" id="image" name="image" class="form-input" placeholder="exemple.jpg" value="<?php echo htmlspecialchars($voitureEdit['image'] ?? ''); ?>">
+            <label class="form-label form-label--required" for="image">Image principale (fichier existant dans images/)</label>
+            <input type="text" id="image" name="image" class="form-input" maxlength="255" placeholder="exemple.jpg" value="<?php echo htmlspecialchars($voitureEdit['image'] ?? ''); ?>" required>
         </div>
 
         <div class="form-group">
             <label class="form-label" for="annee">Année</label>
-            <input type="number" id="annee" name="annee" class="form-input" min="1980" max="2030" placeholder="2024" value="<?php echo htmlspecialchars($voitureEdit['annee'] ?? ''); ?>">
+            <input type="number" id="annee" name="annee" class="form-input" min="1980" max="<?php echo (int) date('Y') + 2; ?>" placeholder="2024" value="<?php echo htmlspecialchars($voitureEdit['annee'] ?? ''); ?>">
         </div>
 
         <div class="form-group">

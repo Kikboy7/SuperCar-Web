@@ -4,10 +4,10 @@
  * Affiche la galerie d'images (voiture_image), les informations et les
  * caracteristiques techniques de la voiture choisie.
  */
-include 'includes/header.php';
+require_once __DIR__ . '/includes/init.php';
 
 // Il faut obligatoirement un id de voiture valide dans l'URL.
-if (!isset($_GET['id']) || !ctype_digit($_GET['id'])) {
+if (!ctype_digit(saisie('id', $_GET))) {
     header("Location: voitures.php");
     exit();
 }
@@ -46,6 +46,7 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$car['id_marque'], $id]);
 $modeles_proches = $stmt->fetchAll();
+include 'includes/header.php';
 ?>
 
 <section class="detail-page">
@@ -64,10 +65,10 @@ $modeles_proches = $stmt->fetchAll();
                 <?php if (count($images) > 0) { ?>
                     <div class="gallery-thumbs">
                         <?php foreach ($images as $index => $img) { ?>
-                            <img src="images/<?php echo e($img['url']); ?>"
+                            <button type="button" class="gallery-choice" aria-label="<?php echo e('Afficher la photo ' . ($index + 1) . ' de ' . $car['nom_marque'] . ' ' . $car['modele']); ?>" aria-pressed="<?php echo $index === 0 ? 'true' : 'false'; ?>"><img src="images/<?php echo e($img['url']); ?>"
                                  alt="Image <?php echo $index + 1; ?>"
                                  class="<?php echo $index === 0 ? 'active' : ''; ?>"
-                                 data-src="images/<?php echo e($img['url']); ?>">
+                                 data-src="images/<?php echo e($img['url']); ?>"></button>
                         <?php } ?>
                     </div>
                 <?php } ?>
@@ -143,8 +144,10 @@ $modeles_proches = $stmt->fetchAll();
 
 <script>
 // Galerie : cliquer sur une miniature remplace l'image principale.
-document.querySelectorAll('.gallery-thumbs img').forEach(function (thumb) {
-    thumb.addEventListener('click', function () {
+document.querySelectorAll('.gallery-choice').forEach(function (button) {
+    button.addEventListener('click', function () {
+        var thumb = button.querySelector('img');
+        document.querySelectorAll('.gallery-choice').forEach(function (choix) { choix.setAttribute('aria-pressed', String(choix === button)); });
         document.querySelectorAll('.gallery-thumbs img').forEach(function (t) { t.classList.remove('active'); });
         thumb.classList.add('active');
         var main = document.getElementById('mainImg');

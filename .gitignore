@@ -6,6 +6,8 @@ Thumbs.db
 # Configuration locale
 .env
 .env.local
+config.local.php
+tests/.audit-*
 
 # Dossiers d'editeur
 .vscode/

@@ -9,15 +9,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!csrf_verify()) {
         $message = '<div class="alert alert--danger"><div class="alert__content"><p class="alert__text">Session de sécurité invalide.</p></div></div>';
     } else {
-        $heroSurtitre = trim($_POST['hero_surtitre']);
-        $heroTitreLigne1 = trim($_POST['hero_titre_ligne1']);
-        $heroTitreLigne2 = trim($_POST['hero_titre_ligne2']);
-        $heroDescription = trim($_POST['hero_description']);
-        $ctaTitre = trim($_POST['cta_titre']);
-        $ctaDescription = trim($_POST['cta_description']);
+        $heroSurtitre = saisie('hero_surtitre');
+        $heroTitreLigne1 = saisie('hero_titre_ligne1');
+        $heroTitreLigne2 = saisie('hero_titre_ligne2');
+        $heroDescription = saisie('hero_description');
+        $ctaTitre = saisie('cta_titre');
+        $ctaDescription = saisie('cta_description');
 
-        if ($heroSurtitre == '' || $heroTitreLigne1 == '' || $heroTitreLigne2 == '' || $heroDescription == '' || $ctaTitre == '' || $ctaDescription == '') {
-            $message = '<div class="alert alert--danger"><div class="alert__content"><p class="alert__text">Tous les champs sont obligatoires.</p></div></div>';
+        if ($heroSurtitre == '' || $heroTitreLigne1 == '' || $heroTitreLigne2 == '' || $heroDescription == '' || $ctaTitre == '' || $ctaDescription == '' || max(mb_strlen($heroSurtitre), mb_strlen($heroTitreLigne1), mb_strlen($heroTitreLigne2), mb_strlen($ctaTitre)) > 150 || max(mb_strlen($heroDescription), mb_strlen($ctaDescription)) > 5000) {
+            $message = '<div class="alert alert--danger"><div class="alert__content"><p class="alert__text">Tous les champs sont obligatoires. Limites : 150 caractères par titre, 5 000 par description.</p></div></div>';
         } else {
             $stmt = $pdo->prepare("
                 UPDATE contenu_accueil

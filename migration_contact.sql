@@ -19,7 +19,7 @@ INSERT IGNORE INTO contenu_contact (cle, valeur) VALUES
 ('adresse', '58–60, Cybercité'),
 ('ville', 'Ébène'),
 ('pays', 'Île Maurice'),
-('telephone_label', 'Appelez-nous'),
+('telephone_label', 'Personnes à contacter'),
 ('telephone', '+230 212 0000'),
 ('telephone_secondaire', '+230 5250 0000'),
 ('email_label', 'Écrivez-nous'),
@@ -28,8 +28,6 @@ INSERT IGNORE INTO contenu_contact (cle, valeur) VALUES
 ('horaires_semaine', 'Lun. – ven. : 08 h – 18 h'),
 ('horaires_samedi', 'Samedi : 09 h – 13 h'),
 ('horaires_complement', ''),
-('visite_note', 'Pour un essai, pensez à réserver votre créneau.'),
-('visite_bouton', 'Demande d’essais'),
 ('form_surtitre', 'Écrivez-nous'),
 ('form_titre', 'Comment pouvons-nous vous aider ?'),
 ('form_intro', 'Présentez-nous votre projet. Nous prendrons le temps de vous répondre.'),
@@ -54,4 +52,9 @@ INSERT IGNORE INTO contenu_contact (cle, valeur) VALUES
 ('erreur_session', 'Votre session a expiré. Veuillez réessayer.'),
 ('erreur_nom', 'Saisissez votre nom complet (100 caractères maximum).'),
 ('erreur_email', 'Saisissez une adresse e-mail valide.'),
-('erreur_message', 'Saisissez votre message (5 000 caractères maximum).');
+('erreur_message', 'Saisissez votre message (5 000 caractères maximum).'),
+('contact_1_nom', 'Camille Laurent'),
+('contact_1_role', 'Conseillère clientèle'),
+('contact_2_nom', 'Julien Morel'),
+('contact_2_role', 'Immatriculation'),
+('contacts_note', 'Interlocuteurs fictifs pour ce projet pédagogique.');
